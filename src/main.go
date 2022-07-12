@@ -6,6 +6,7 @@ import (
 	"log"
 	"nomen_aliud/duphunter/file_info"
 	"sort"
+	"strings"
 )
 
 var logLevel int
@@ -53,6 +54,8 @@ func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 func main() {
 	minSizeFlag := flag.Int64("min-size", 1, "Minimum file size to include")
 	verboseFlag := flag.Bool("verbose", false, "Verbosity")
+	outTmpl := flag.String("out-tmpl", "$1 -- $2", "Output")
+	baseTmpl := flag.String("base-tmpl", "$1", "Template to print base file for each duplicate group")
 	flag.Parse()
 
 	if *verboseFlag {
@@ -97,11 +100,18 @@ func main() {
 		return
 	}
 	for _, group := range results {
+		var basePath string
 		for i, f := range group {
 			if i == 0 {
-				fmt.Printf("%v\n", f.Path)
+				basePath = f.Path
+				if len(*baseTmpl) > 0 {
+					out := strings.ReplaceAll(*baseTmpl, "$1", basePath)
+					fmt.Println(out)
+				}
 			} else {
-				fmt.Printf("  %v\n", f.Path)
+				out := strings.ReplaceAll(*outTmpl, "$1", basePath)
+				out = strings.ReplaceAll(out, "$2", f.Path)
+				fmt.Println(out)
 			}
 		}
 	}
