@@ -51,23 +51,7 @@ func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	return result
 }
 
-func main() {
-	minSizeFlag := flag.Int64("min-size", 1, "Minimum file size to include")
-	verboseFlag := flag.Bool("verbose", false, "Verbosity")
-	outTmpl := flag.String("out-tmpl", "$1 -- $2", "Output")
-	baseTmpl := flag.String("base-tmpl", "$1", "Template to print base file for each duplicate group")
-	flag.Parse()
-
-	if *verboseFlag {
-		logLevel = 1
-	}
-
-	files := file_info.ScanCurrentDir(*minSizeFlag)
-
-	// We could call sameSizeDups here, e.g. -
-	// fmt.Println(sameSizeDups(files))
-	// But that would not take advantage of size based clustering.
-
+func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	filesBySize := make(map[int64][]file_info.FileInfo)
 	for _, f := range files {
 		filesBySize[f.Size] = append(filesBySize[f.Size], f)
@@ -94,25 +78,49 @@ func main() {
 			results = append(results, r...)
 		}
 	}
+	return results
+}
 
-	if len(results) == 0 {
+func main() {
+	minSizeFlag := flag.Int64("min-size", 1, "Minimum file size to include")
+	verboseFlag := flag.Bool("verbose", false, "Verbosity")
+	outTmplFlag := flag.String("out-tmpl", "$1 -- $2", "Output template")
+	baseTmplFlag := flag.String("base-tmpl", "$1", "Base template - set to empty to avoid printing")
+
+	flag.Parse()
+
+	if *verboseFlag {
+		logLevel = 1
+	}
+
+	files := file_info.ScanCurrentDir(*minSizeFlag)
+
+	// We could call sameSizeDups here, e.g. -
+	// fmt.Println(sameSizeDups(files))
+	// But that would not take advantage of size based clustering.
+
+	duplicateGroups := findDups(files)
+
+	if len(duplicateGroups) == 0 {
 		// Goes to stderr.
 		println("No duplicates found.")
 		return
 	}
-	for _, group := range results {
+	for _, group := range duplicateGroups {
 		var basePath string
 		for i, f := range group {
 			if i == 0 {
 				basePath = f.Path
-				if len(*baseTmpl) > 0 {
-					out := strings.ReplaceAll(*baseTmpl, "$1", basePath)
+				if len(*baseTmplFlag) > 0 {
+					out := strings.ReplaceAll(*baseTmplFlag, "$1", basePath)
 					fmt.Println(out)
 				}
 			} else {
-				out := strings.ReplaceAll(*outTmpl, "$1", basePath)
-				out = strings.ReplaceAll(out, "$2", f.Path)
-				fmt.Println(out)
+				if len(*outTmplFlag) > 0 {
+					out := strings.ReplaceAll(*outTmplFlag, "$1", basePath)
+					out = strings.ReplaceAll(out, "$2", f.Path)
+					fmt.Println(out)
+				}
 			}
 		}
 	}
