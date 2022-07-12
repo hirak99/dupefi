@@ -100,9 +100,9 @@ func (f1 *FileInfo) IsDupOf(f2 *FileInfo) bool {
 	return compare(f1.Path, f2.Path)
 }
 
-func ScanCurrentDir(minSize int64) []FileInfo {
+func ScanDir(dir string, minSize int64) []FileInfo {
 	var files []FileInfo
-	err := filepath.Walk(".",
+	err := filepath.Walk(dir,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err

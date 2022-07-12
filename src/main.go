@@ -11,10 +11,18 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-var logLevel int
+var opts struct {
+	MinSize      int64  `long:"min-size" default:"1" description:"Minimum file size to include"`
+	Verbose      bool   `short:"v" description:"Make it verbose"`
+	OutTemplate  string `long:"out-tmpl" default:"$1 -- $2" description:"Output template"`
+	BaseTemplate string `long:"base-tmpl" default:"$1" description:"Template for base file"`
+	Positional   struct {
+		Directory string
+	} `positional-args:"yes" required:"yes"`
+}
 
 func debugLog(s string, a ...interface{}) {
-	if 1 <= logLevel {
+	if opts.Verbose {
 		log.Printf(s, a...)
 	}
 }
@@ -83,24 +91,13 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	return results
 }
 
-var opts struct {
-	MinSize      int64  `long:"min-size" default:"1" description:"Minimum file size to include"`
-	Verbose      bool   `short:"v" description:"Make it verbose"`
-	OutTemplate  string `long:"out-tmpl" default:"$1 --$2" description:"Output template"`
-	BaseTemplate string `long:"base-tmpl" default:"$1" description:"Template for base file"`
-}
-
 func main() {
-	_, err := flags.ParseArgs(&opts, os.Args)
+	_, err := flags.ParseArgs(&opts, os.Args[1:])
 	if err != nil {
 		panic(err)
 	}
 
-	if opts.Verbose {
-		logLevel = 1
-	}
-
-	files := file_info.ScanCurrentDir(opts.MinSize)
+	files := file_info.ScanDir(opts.Positional.Directory, opts.MinSize)
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))
