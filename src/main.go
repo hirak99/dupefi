@@ -12,10 +12,10 @@ import (
 )
 
 var opts struct {
-	MinSize      int64  `long:"min-size" default:"1" description:"Minimum file size to include"`
+	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
 	Verbose      bool   `short:"v" description:"Make it verbose"`
-	OutTemplate  string `long:"out-tmpl" default:"$1 -- $2" description:"Output template"`
-	BaseTemplate string `long:"base-tmpl" default:"$1" description:"Template for base file"`
+	OutTemplate  string `long:"out-tmpl" description:"Output template" default:"$1 -- $2"`
+	BaseTemplate string `long:"base-tmpl" description:"Template for base file" default:"$1"`
 	Positional   struct {
 		Directory string
 	} `positional-args:"yes" required:"yes"`
