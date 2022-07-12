@@ -105,7 +105,10 @@ func pluralize(count int, name string) string {
 func main() {
 	_, err := flags.ParseArgs(&opts, os.Args[1:])
 	if err != nil {
-		panic(err)
+		if !flags.WroteHelp(err) {
+			panic(err)
+		}
+		return
 	}
 
 	files := file_info.ScanDir(opts.Positional.Directory, opts.MinSize)
