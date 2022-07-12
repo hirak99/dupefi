@@ -96,7 +96,8 @@ func main() {
 	}
 
 	if len(results) == 0 {
-		fmt.Println("No duplicates found.")
+		// Goes to stderr.
+		println("No duplicates found.")
 		return
 	}
 	for _, group := range results {

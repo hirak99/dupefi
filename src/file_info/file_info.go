@@ -88,7 +88,7 @@ func compare(path1, path2 string) bool {
 }
 
 func (f1 *FileInfo) IsDupOf(f2 *FileInfo) bool {
-	if f1.Inode == f2.Inode {
+	if f1.Inode != 0 && f1.Inode == f2.Inode {
 		return true
 	}
 	if f1.Size != f2.Size {
@@ -110,11 +110,14 @@ func ScanCurrentDir(minSize int64) []FileInfo {
 			if info.IsDir() || info.Size() < minSize {
 				return nil
 			}
+			var inode uint64
 			stat, ok := info.Sys().(*syscall.Stat_t)
 			if !ok {
 				return errors.New(fmt.Sprintf("Could not perform syscall on %v", path))
+			} else {
+				inode = stat.Ino
 			}
-			files = append(files, FileInfo{Path: path, Info: info, Inode: stat.Ino, Size: info.Size()})
+			files = append(files, FileInfo{Path: path, Info: info, Inode: inode, Size: info.Size()})
 			return nil
 		})
 	if err != nil {
