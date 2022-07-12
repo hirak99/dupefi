@@ -1,12 +1,14 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"nomen_aliud/duphunter/file_info"
+	"os"
 	"sort"
 	"strings"
+
+	"github.com/jessevdk/go-flags"
 )
 
 var logLevel int
@@ -81,19 +83,24 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	return results
 }
 
+var opts struct {
+	MinSize      int64  `long:"min-size" default:"1" description:"Minimum file size to include"`
+	Verbose      bool   `short:"v" description:"Make it verbose"`
+	OutTemplate  string `long:"out-tmpl" default:"$1 --$2" description:"Output template"`
+	BaseTemplate string `long:"base-tmpl" default:"$1" description:"Template for base file"`
+}
+
 func main() {
-	minSizeFlag := flag.Int64("min-size", 1, "Minimum file size to include")
-	verboseFlag := flag.Bool("verbose", false, "Verbosity")
-	outTmplFlag := flag.String("out-tmpl", "$1 -- $2", "Output template")
-	baseTmplFlag := flag.String("base-tmpl", "$1", "Base template - set to empty to avoid printing")
+	_, err := flags.ParseArgs(&opts, os.Args)
+	if err != nil {
+		panic(err)
+	}
 
-	flag.Parse()
-
-	if *verboseFlag {
+	if opts.Verbose {
 		logLevel = 1
 	}
 
-	files := file_info.ScanCurrentDir(*minSizeFlag)
+	files := file_info.ScanCurrentDir(opts.MinSize)
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))
@@ -111,13 +118,13 @@ func main() {
 		for i, f := range group {
 			if i == 0 {
 				basePath = f.Path
-				if len(*baseTmplFlag) > 0 {
-					out := strings.ReplaceAll(*baseTmplFlag, "$1", basePath)
+				if opts.BaseTemplate != "" {
+					out := strings.ReplaceAll(opts.BaseTemplate, "$1", basePath)
 					fmt.Println(out)
 				}
 			} else {
-				if len(*outTmplFlag) > 0 {
-					out := strings.ReplaceAll(*outTmplFlag, "$1", basePath)
+				if opts.OutTemplate != "" {
+					out := strings.ReplaceAll(opts.OutTemplate, "$1", basePath)
 					out = strings.ReplaceAll(out, "$2", f.Path)
 					fmt.Println(out)
 				}
