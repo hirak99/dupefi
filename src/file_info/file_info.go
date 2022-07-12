@@ -13,10 +13,12 @@ import (
 )
 
 type FileInfo struct {
-	Path     string
-	Inode    uint64
-	Info     os.FileInfo
-	Size     int64
+	Path string
+	Size int64
+
+	info  os.FileInfo
+	inode uint64
+	// Don't access directly, call getChecksum() instead.
 	checksum *string
 }
 
@@ -29,7 +31,7 @@ var NChecksums int
 // Total number of full comparisons done
 var NFullComparisons int
 
-func (f *FileInfo) Checksum() string {
+func (f *FileInfo) getChecksum() string {
 	if f.checksum == nil {
 		NChecksums++
 
@@ -98,13 +100,13 @@ func compare(path1, path2 string) bool {
 }
 
 func (f1 *FileInfo) IsDupOf(f2 *FileInfo) bool {
-	if f1.Inode != 0 && f1.Inode == f2.Inode {
+	if f1.inode != 0 && f1.inode == f2.inode {
 		return true
 	}
 	if f1.Size != f2.Size {
 		return false
 	}
-	if f1.Checksum() != f2.Checksum() {
+	if f1.getChecksum() != f2.getChecksum() {
 		return false
 	}
 	return compare(f1.Path, f2.Path)
@@ -127,7 +129,7 @@ func ScanDir(dir string, minSize int64) []FileInfo {
 			} else {
 				inode = stat.Ino
 			}
-			files = append(files, FileInfo{Path: path, Info: info, Inode: inode, Size: info.Size()})
+			files = append(files, FileInfo{Path: path, info: info, inode: inode, Size: info.Size()})
 			return nil
 		})
 	if err != nil {
