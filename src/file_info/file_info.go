@@ -23,8 +23,16 @@ type FileInfo struct {
 // How many bytes to read at once, for check-summing or file comparisons.
 const bufferSize = 1024 * 4 // 4 KiB
 
+// Total number of checksums computed.
+var NChecksums int
+
+// Total number of full comparisons done
+var NFullComparisons int
+
 func (f *FileInfo) Checksum() string {
 	if f.checksum == nil {
+		NChecksums++
+
 		hasher := sha256.New()
 
 		handle, err := os.Open(f.Path)
@@ -51,6 +59,8 @@ func (f *FileInfo) Checksum() string {
 
 // Returns true if files are same.
 func compare(path1, path2 string) bool {
+	NFullComparisons++
+
 	f1, err := os.Open(path1)
 	if err != nil {
 		log.Fatal(err)

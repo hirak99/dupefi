@@ -27,6 +27,13 @@ func debugLog(s string, a ...interface{}) {
 	}
 }
 
+func If[T any](cond bool, vtrue, vfalse T) T {
+	if cond {
+		return vtrue
+	}
+	return vfalse
+}
+
 func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	var groups [][]int
 	for i := 0; i < len(files); i++ {
@@ -81,7 +88,7 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 
 	var results [][]file_info.FileInfo
 	for _, size := range sizes {
-		debugLog("Checking %v file(s) for size %v...\n", len(filesBySize[size]), size)
+		// debugLog("Checking %v file(s) for size %v...\n", len(filesBySize[size]), size)
 		r := sameSizeDups(filesBySize[size])
 		if len(r) > 0 {
 			debugLog("Found some dups")
@@ -89,6 +96,10 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 		}
 	}
 	return results
+}
+
+func pluralize(count int, name string) string {
+	return fmt.Sprintf("%v %v%v", count, name, If(count > 1, "s", ""))
 }
 
 func main() {
@@ -105,9 +116,13 @@ func main() {
 
 	duplicateGroups := findDups(files)
 
+	defer func() {
+		debugLog("Checksums computed: %v, Full comparisons: %v", file_info.NChecksums, file_info.NFullComparisons)
+	}()
+
 	if len(duplicateGroups) == 0 {
 		// Goes to stderr.
-		println("No duplicates found.")
+		println(fmt.Sprintf("No duplicates found in %v.", pluralize(len(files), "file")))
 		return
 	}
 	for _, group := range duplicateGroups {
