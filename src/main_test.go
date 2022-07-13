@@ -5,10 +5,16 @@ import (
 	"nomen_aliud/duphunter/file_info"
 	"os"
 	"path"
+	"reflect"
 	"testing"
 )
 
-func addFile(name string, content []byte) {
+func Map_[T any, U any](data []T, f func(T) U) []U {
+	mapped := make([]U, len(data))
+	for i, e := range data {
+		mapped[i] = f(e)
+	}
+	return mapped
 }
 
 func TestHelloName(t *testing.T) {
@@ -17,13 +23,25 @@ func TestHelloName(t *testing.T) {
 		panic(err)
 	}
 	defer os.RemoveAll(dir)
+
 	os.WriteFile(path.Join(dir, "f0"), []byte(""), 0644)
 	os.WriteFile(path.Join(dir, "f1"), []byte("Hello1"), 0644)
 	os.WriteFile(path.Join(dir, "f2"), []byte("Hello1"), 0644)
 	os.WriteFile(path.Join(dir, "f3"), []byte("Hello2"), 0644)
+
 	files := file_info.ScanDir(dir, 1)
 	if len(files) != 3 {
 		t.Fatalf("Found %v files: %v", len(files), files)
+	}
+
+	// Name of files found ignoring the dir.
+	names := Map_(files, func(f file_info.FileInfo) string {
+		return f.Path[len(dir)+1:]
+	})
+	// We don't expect f0 since it has zero length.
+	want := []string{"f1", "f2", "f3"}
+	if !reflect.DeepEqual(names, want) {
+		t.Fatalf("Names are not the same. want: %v, got: %v", want, names)
 	}
 
 	dups := findDups(files)
