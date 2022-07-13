@@ -11,14 +11,18 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+// Stores the git hash passed in build script.
+var Githash string
+
 var opts struct {
 	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
 	Verbose      bool   `short:"v" description:"Make it verbose"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:"$1"`
+	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
 	Positional   struct {
 		Directory string
-	} `positional-args:"yes" required:"yes"`
+	} `positional-args:"yes"`
 }
 
 func debugLog(s string, a ...interface{}) {
@@ -134,6 +138,15 @@ func main() {
 			panic(err)
 		}
 		return
+	}
+
+	if opts.ShowVersion {
+		fmt.Printf("Git commit hash: %s\n", Githash)
+		return
+	}
+
+	if opts.Positional.Directory == "" {
+		opts.Positional.Directory = "."
 	}
 
 	files := file_info.ScanDir(opts.Positional.Directory, opts.MinSize)

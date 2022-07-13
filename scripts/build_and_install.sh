@@ -2,6 +2,6 @@
 set -uexo pipefail
 readonly MY_PATH=$(cd $(dirname "$0") && pwd)
 cd $MY_PATH/../src
-go build .
+go build -ldflags "-X main.Githash=$(git rev-parse HEAD)"
 sudo install -Dm755 ./duphunter /usr/bin/duphunter
 rm duphunter
