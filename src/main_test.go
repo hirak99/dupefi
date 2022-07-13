@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func Map_[T any, U any](data []T, f func(T) U) []U {
+func Map[T any, U any](data []T, f func(T) U) []U {
 	mapped := make([]U, len(data))
 	for i, e := range data {
 		mapped[i] = f(e)
@@ -17,7 +17,27 @@ func Map_[T any, U any](data []T, f func(T) U) []U {
 	return mapped
 }
 
-func TestHelloName(t *testing.T) {
+func GeneratorToSlice[T any](c <-chan T) []T {
+	var result []T
+	for v := range c {
+		result = append(result, v)
+	}
+	return result
+}
+
+func AssertEqual[T comparable](t *testing.T, got, want T) {
+	if got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func AssertSliceEqual[T any](t *testing.T, got, want []T) {
+	if !reflect.DeepEqual(want, got) {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func TestDuphunting(t *testing.T) {
 	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
 	if err != nil {
 		panic(err)
@@ -35,29 +55,21 @@ func TestHelloName(t *testing.T) {
 	os.WriteFile(path.Join(dir, "subd1", "f5"), []byte("Hello"), 0644)
 
 	files := file_info.ScanDir(".", 1)
-	names := Map_(files, func(f file_info.FileInfo) string {
-		return f.Path
-	})
 	// We don't expect f0 since it has zero length.
-	want := []string{"f1", "f2", "f3", "subd1/f4", "subd1/f5"}
-	if !reflect.DeepEqual(names, want) {
-		t.Fatalf("Names are not the same. want: %v, got: %v", want, names)
-	}
+	AssertSliceEqual(t,
+		Map(files, func(f file_info.FileInfo) string {
+			return f.Path
+		}),
+		[]string{"f1", "f2", "f3", "subd1/f4", "subd1/f5"})
 
 	dups := findDups(files)
-	if len(dups) != 1 {
-		t.Fatalf("Found %v dup groups", len(dups))
-	}
+	AssertEqual(t, len(dups), 1)
+	AssertEqual(t, len(dups[0]), 2)
 
-	if len(dups[0]) != 2 {
-		t.Fatalf("Found %v dup[0] files", len(dups[0]))
-	}
-
-	var lines []string
-	for line := range getDisplayLines(dups, "$1", "$0 -- $1") {
-		lines = append(lines, line)
-	}
-	if !reflect.DeepEqual(lines, []string{"f2", "f2 -- subd1/f4"}) {
-		t.Fatalf("Displayed lines are: %v", lines)
-	}
+	AssertSliceEqual(t,
+		GeneratorToSlice(getDisplayLines(dups, "$1", "$0 -- $1")),
+		[]string{"f2", "f2 -- subd1/f4"})
+	AssertSliceEqual(t,
+		GeneratorToSlice(getDisplayLines(dups, "", "$0 -- $1")),
+		[]string{"f2 -- subd1/f4"})
 }

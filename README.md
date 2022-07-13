@@ -8,17 +8,15 @@ A command-line duplicate file finder with customizable output.
 ```bash
 $ duphunter .
 # Output -
-/path/to/f1
 /path/to/f1 -- /path/to/f1copy1
 /path/to/f1 -- /path/to/f1copy2
-/path/to/f2
 /path/to/f2 -- /path/to/f2copy1
 /path/to/f2 -- /path/to/f2copy2
 ```
 
 Change output template to output json.
 ```bash
-$ duphunter . --basetmpl '' --outtmpl '{"source": "$0", "copy": "$1"}'
+$ duphunter . --outtmpl '{"source": "$0", "copy": "$1"}'
 # Output -
 {"source": "/path/to/f1" "copy": "/path/to/f1copy1"}
 {"source": "/path/to/f1" "copy": "/path/to/f1copy2"}
@@ -31,7 +29,7 @@ Change output template to print commands to create hard links. Note that the
 commands are not actually executed. Output is *always* just printed.
 
 ```bash
-$ duphunter . --basetmpl '' --outtmpl 'cp -l $0 $1'
+$ duphunter . --outtmpl 'cp -l $0 $1'
 # Output -
 cp -l /path/to/f1 /path/to/f1copy1
 cp -l /path/to/f1 /path/to/f1copy2
@@ -40,13 +38,12 @@ cp -l /path/to/f2 /path/to/f2copy2
 ```
 If desired, you can copy the output to a bash script and execute it.
 
-WARNING: Do it at your own risk!
 ```bash
 # WARNING: If you follow this example, existing attributes of replaced
 # files such timestamps will be lost.
 
 # Replace all duplicates with hard links.
-duphunter . --basetmpl '' --outtmpl 'cp -l $0 $1' > cleanup.sh
+duphunter . --outtmpl 'cp -l $0 $1' > cleanup.sh
 
 # Review the commands carefully.
 head cleanup.sh

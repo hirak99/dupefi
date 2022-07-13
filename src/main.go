@@ -18,7 +18,7 @@ var opts struct {
 	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
 	Verbose      bool   `short:"v" description:"Make it verbose"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
-	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:"$1"`
+	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
 	Positional   struct {
 		Directory string
