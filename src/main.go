@@ -102,26 +102,29 @@ func pluralize(count int, name string) string {
 	return fmt.Sprintf("%v %v%v", count, name, If(count > 1, "s", ""))
 }
 
-func getDisplayLines(duplicateGroups [][]file_info.FileInfo, baseTemplate string, outTemplate string) []string {
-	var result []string
-	for _, group := range duplicateGroups {
-		var basePath string
-		for i, f := range group {
-			if i == 0 {
-				basePath = f.Path
-				if baseTemplate != "" {
-					result = append(result, strings.ReplaceAll(baseTemplate, "$1", basePath))
-				}
-			} else {
-				if outTemplate != "" {
-					out := strings.ReplaceAll(outTemplate, "$1", f.Path)
-					out = strings.ReplaceAll(out, "$0", basePath)
-					result = append(result, out)
+func getDisplayLines(duplicateGroups [][]file_info.FileInfo, baseTemplate string, outTemplate string) <-chan string {
+	out := make(chan string)
+	go func() {
+		for _, group := range duplicateGroups {
+			var basePath string
+			for i, f := range group {
+				if i == 0 {
+					basePath = f.Path
+					if baseTemplate != "" {
+						out <- strings.ReplaceAll(baseTemplate, "$1", basePath)
+					}
+				} else {
+					if outTemplate != "" {
+						line := strings.ReplaceAll(outTemplate, "$1", f.Path)
+						line = strings.ReplaceAll(line, "$0", basePath)
+						out <- line
+					}
 				}
 			}
 		}
-	}
-	return result
+		close(out)
+	}()
+	return out
 }
 
 func main() {
@@ -150,7 +153,7 @@ func main() {
 		println(fmt.Sprintf("No duplicates found in %v.", pluralize(len(files), "file")))
 		return
 	}
-	for _, line := range getDisplayLines(duplicateGroups, opts.BaseTemplate, opts.OutTemplate) {
+	for line := range getDisplayLines(duplicateGroups, opts.BaseTemplate, opts.OutTemplate) {
 		fmt.Println(line)
 	}
 }
