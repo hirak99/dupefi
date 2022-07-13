@@ -5,37 +5,8 @@ import (
 	"nomen_aliud/duphunter/file_info"
 	"os"
 	"path"
-	"reflect"
 	"testing"
 )
-
-func Map[T any, U any](data []T, f func(T) U) []U {
-	mapped := make([]U, len(data))
-	for i, e := range data {
-		mapped[i] = f(e)
-	}
-	return mapped
-}
-
-func GeneratorToSlice[T any](c <-chan T) []T {
-	var result []T
-	for v := range c {
-		result = append(result, v)
-	}
-	return result
-}
-
-func AssertEqual[T comparable](t *testing.T, got, want T) {
-	if got != want {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-}
-
-func AssertSliceEqual[T any](t *testing.T, got, want []T) {
-	if !reflect.DeepEqual(want, got) {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-}
 
 func TestDuphunting(t *testing.T) {
 	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
