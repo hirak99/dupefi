@@ -64,5 +64,5 @@ Run `duphunter --help` to display available args.
 ```bash
 git clone ...
 cd ...
-./build_and_install.sh
+scripts/build_and_install.sh
 ```
