@@ -18,7 +18,7 @@ $ duphunter .
 
 Change output template to output json.
 ```bash
-$ duphunter . --basetmpl '' --outtmpl '{"source": "$1", "copy": "$2"}'
+$ duphunter . --basetmpl '' --outtmpl '{"source": "$0", "copy": "$1"}'
 # Output -
 {"source": "/path/to/f1" "copy": "/path/to/f1copy1"}
 {"source": "/path/to/f1" "copy": "/path/to/f1copy2"}
@@ -31,7 +31,7 @@ Change output template to print commands to create hard links. Note that the
 commands are not actually executed. Output is *always* just printed.
 
 ```bash
-$ duphunter . --basetmpl '' --outtmpl 'cp -l $1 $2'
+$ duphunter . --basetmpl '' --outtmpl 'cp -l $0 $1'
 # Output -
 cp -l /path/to/f1 /path/to/f1copy1
 cp -l /path/to/f1 /path/to/f1copy2
@@ -46,7 +46,7 @@ WARNING: Do it at your own risk!
 # files such timestamps will be lost.
 
 # Replace all duplicates with hard links.
-duphunter . --basetmpl '' --outtmpl 'cp -l $1 $2' > cleanup.sh
+duphunter . --basetmpl '' --outtmpl 'cp -l $0 $1' > cleanup.sh
 
 # Review the commands carefully.
 head cleanup.sh

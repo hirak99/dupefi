@@ -14,7 +14,7 @@ import (
 var opts struct {
 	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
 	Verbose      bool   `short:"v" description:"Make it verbose"`
-	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$1 -- $2"`
+	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:"$1"`
 	Positional   struct {
 		Directory string
@@ -139,8 +139,8 @@ func main() {
 				}
 			} else {
 				if opts.OutTemplate != "" {
-					out := strings.ReplaceAll(opts.OutTemplate, "$1", basePath)
-					out = strings.ReplaceAll(out, "$2", f.Path)
+					out := strings.ReplaceAll(opts.OutTemplate, "$1", f.Path)
+					out = strings.ReplaceAll(out, "$0", basePath)
 					fmt.Println(out)
 				}
 			}
