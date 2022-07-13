@@ -24,19 +24,20 @@ func TestHelloName(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
+	os.Chdir(dir)
+
 	os.WriteFile(path.Join(dir, "f0"), []byte(""), 0644)
 	os.WriteFile(path.Join(dir, "f1"), []byte("Hello1"), 0644)
 	os.WriteFile(path.Join(dir, "f2"), []byte("Hello1"), 0644)
 	os.WriteFile(path.Join(dir, "f3"), []byte("Hello2"), 0644)
 
-	files := file_info.ScanDir(dir, 1)
+	files := file_info.ScanDir(".", 1)
 	if len(files) != 3 {
 		t.Fatalf("Found %v files: %v", len(files), files)
 	}
 
-	// Name of files found ignoring the dir.
 	names := Map_(files, func(f file_info.FileInfo) string {
-		return f.Path[len(dir)+1:]
+		return f.Path
 	})
 	// We don't expect f0 since it has zero length.
 	want := []string{"f1", "f2", "f3"}
@@ -51,5 +52,10 @@ func TestHelloName(t *testing.T) {
 
 	if len(dups[0]) != 2 {
 		t.Fatalf("Found %v dup[0] files", len(dups[0]))
+	}
+
+	lines := getDisplayLines(dups, "$1", "$0 -- $1")
+	if !reflect.DeepEqual(lines, []string{"f1", "f1 -- f2"}) {
+		t.Fatalf("Incorrect display %v", lines)
 	}
 }

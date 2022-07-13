@@ -102,6 +102,28 @@ func pluralize(count int, name string) string {
 	return fmt.Sprintf("%v %v%v", count, name, If(count > 1, "s", ""))
 }
 
+func getDisplayLines(duplicateGroups [][]file_info.FileInfo, baseTemplate string, outTemplate string) []string {
+	var result []string
+	for _, group := range duplicateGroups {
+		var basePath string
+		for i, f := range group {
+			if i == 0 {
+				basePath = f.Path
+				if baseTemplate != "" {
+					result = append(result, strings.ReplaceAll(baseTemplate, "$1", basePath))
+				}
+			} else {
+				if outTemplate != "" {
+					out := strings.ReplaceAll(outTemplate, "$1", f.Path)
+					out = strings.ReplaceAll(out, "$0", basePath)
+					result = append(result, out)
+				}
+			}
+		}
+	}
+	return result
+}
+
 func main() {
 	_, err := flags.ParseArgs(&opts, os.Args[1:])
 	if err != nil {
@@ -128,22 +150,7 @@ func main() {
 		println(fmt.Sprintf("No duplicates found in %v.", pluralize(len(files), "file")))
 		return
 	}
-	for _, group := range duplicateGroups {
-		var basePath string
-		for i, f := range group {
-			if i == 0 {
-				basePath = f.Path
-				if opts.BaseTemplate != "" {
-					out := strings.ReplaceAll(opts.BaseTemplate, "$1", basePath)
-					fmt.Println(out)
-				}
-			} else {
-				if opts.OutTemplate != "" {
-					out := strings.ReplaceAll(opts.OutTemplate, "$1", f.Path)
-					out = strings.ReplaceAll(out, "$0", basePath)
-					fmt.Println(out)
-				}
-			}
-		}
+	for _, line := range getDisplayLines(duplicateGroups, opts.BaseTemplate, opts.OutTemplate) {
+		fmt.Println(line)
 	}
 }
