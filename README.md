@@ -1,10 +1,10 @@
-# Duphunter
-
 A command-line duplicate file finder with customizable output.
 
-## Installation (Linux)
+# Installation (Linux)
 
 Dependency: Install [golang](https://go.dev/doc/install) for your system.
+
+Then run the following -
 
 ```bash
 git clone https://github.com/hirak99/duphunter
@@ -15,9 +15,9 @@ scripts/build_and_install.sh
 Note: With minor modifications, it *should* also work on Windows. If anyone does
 it, please send me a pull request.
 
-## Usage
+# Usage
 
-### Call Examples
+## Call Examples
 ```bash
 $ duphunter .
 # Output -
@@ -37,9 +37,12 @@ $ duphunter . --outtmpl '{"source": "$0", "copy": "$1"}'
 {"source": "/path/to/f2" "copy": "/path/to/f2copy2"}
 ```
 
-### Code Generation & Cleaning Up
-Change output template to print commands to create hard links. Note that the
-commands are not actually executed. Output is *always* just printed.
+# Advanced Usage
+## Hard Link All Duplicates
+To do this we will modify the template to generate code, and then run it.
+
+Note that the commands are not actually executed. Output is *always* just
+printed.
 
 ```bash
 $ duphunter . --outtmpl 'cp -l $0 $1'
@@ -49,7 +52,8 @@ cp -l /path/to/f1 /path/to/f1copy2
 cp -l /path/to/f2 /path/to/f2copy1
 cp -l /path/to/f2 /path/to/f2copy2
 ```
-If desired, you can copy the output to a bash script and execute it.
+If desired, you can copy the output to a bash script and execute it. Below is an
+example that hard links all duplicate files.
 
 ```bash
 # WARNING: If you follow this example, existing attributes of replaced
@@ -61,10 +65,21 @@ duphunter . --outtmpl 'cp -l $0 $1' > cleanup.sh
 # Review the commands carefully.
 head cleanup.sh
 
-# Run generated commands. After you do this, there is no going back!
+# Run generated commands.
+# WARNING: Running this will make changes that you cannot undo!
 source cleanup.sh
 ```
 
-## Help
+In similar way, you can create and run commands to delete, archive, symlink, query all duplicates too.
+
+## Estimate Size of All Duplicates
+
+Print the total size used in duplicates.
+
+```bash
+duphunter . --outtmpl '$1' | xargs du -sch
+```
+
+# Help
 
 Run `duphunter --help` to display available args.
