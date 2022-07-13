@@ -2,6 +2,19 @@
 
 A command-line duplicate file finder with customizable output.
 
+## Installation (Linux)
+
+Dependency: Install [golang](https://go.dev/doc/install) for your system.
+
+```bash
+git clone https://github.com/hirak99/duphunter
+cd duphunter
+scripts/build_and_install.sh
+```
+
+Note: With minor modifications, it *should* also work on Windows. If anyone does
+it, please send me a pull request.
+
 ## Usage
 
 ### Call Examples
@@ -55,11 +68,3 @@ source cleanup.sh
 ## Help
 
 Run `duphunter --help` to display available args.
-
-## Installation
-
-```bash
-git clone ...
-cd ...
-scripts/build_and_install.sh
-```
