@@ -100,15 +100,15 @@ func compare(path1, path2 string) bool {
 
 }
 
-func (f1 *FileInfo) IsDupOf(f2 *FileInfo) bool {
+func (f1 *FileInfo) IsDupOf(f2 *FileInfo, useChecksum bool) bool {
 	if f1.inode != 0 && f1.inode == f2.inode {
 		return true
 	}
 	if f1.Size != f2.Size {
 		return false
 	}
-	if f1.getChecksum() != f2.getChecksum() {
-		return false
+	if useChecksum {
+		return f1.getChecksum() == f2.getChecksum()
 	}
 	return compare(f1.Path, f2.Path)
 }

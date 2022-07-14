@@ -18,6 +18,7 @@ var Githash string
 var opts struct {
 	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
 	Verbose      bool   `short:"v" description:"Make it verbose"`
+	Checksum     bool   `short:"c" description:"Use checksum to compare - may require less disk access if there are many similar files"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
@@ -39,7 +40,7 @@ func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 		found := false
 		for gi := range groups {
 			// Compare only with the first element in each group.
-			if files[i].IsDupOf(&files[groups[gi][0]]) {
+			if files[i].IsDupOf(&files[groups[gi][0]], opts.Checksum) {
 				// Matched, add to group.
 				groups[gi] = append(groups[gi], i)
 				found = true
