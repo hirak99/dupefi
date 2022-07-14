@@ -8,6 +8,21 @@ import (
 	"testing"
 )
 
+func TestEmptyDir(t *testing.T) {
+	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	os.Chdir(dir)
+
+	files := file_info.ScanDir(".", 1)
+	AssertEqual(t, len(files), 0)
+	dups := findDups(files)
+	AssertEqual(t, len(dups), 0)
+}
+
 func TestDuphunting(t *testing.T) {
 	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
 	if err != nil {
