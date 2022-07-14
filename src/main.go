@@ -21,7 +21,7 @@ var opts struct {
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
-	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. \".jpg$\"" default:""`
+	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'" default:""`
 	Positional   struct {
 		Directory string
 	} `positional-args:"yes"`
