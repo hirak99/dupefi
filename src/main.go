@@ -23,7 +23,7 @@ var opts struct {
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
 	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'" default:""`
-	InodeAsDup   bool   `short:"i" description:"Consider hardlinks with same inode as duplicates"`
+	InodeAsDup   bool   `short:"i" description:"Report multiple hardlinks to the same inode as duplicates"`
 	Positional   struct {
 		Directory string
 	} `positional-args:"yes"`
@@ -133,13 +133,14 @@ func postProcessGroup(group []file_info.FileInfo) []file_info.FileInfo {
 	var result []file_info.FileInfo
 	result = append(result, group...)
 	if !opts.InodeAsDup {
+		sort.Slice(result, func(i, j int) bool {
+			return result[i].Inode < result[j].Inode
+		})
 		result = Filter(result,
 			func(i int, _ file_info.FileInfo) bool {
 				return i == 0 || result[i].Inode != result[i-1].Inode
 			})
 	}
-	fmt.Println(group)
-	fmt.Println(result)
 	return result
 }
 

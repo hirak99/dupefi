@@ -32,6 +32,11 @@ var NChecksums int
 // Total number of full comparisons done
 var NFullComparisons int
 
+// Used for mocking in tests.
+func FakeFile(path string, size int64, inode uint64) FileInfo {
+	return FileInfo{Path: path, Size: size, Inode: inode}
+}
+
 func (f *FileInfo) getChecksum() string {
 	if f.checksum == nil {
 		NChecksums++

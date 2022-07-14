@@ -52,6 +52,8 @@ func ChanToSlice[T any](c <-chan T) []T {
 	return result
 }
 
+// Testing methods.
+
 func AssertEqual[T comparable](t *testing.T, got, want T) {
 	if got != want {
 		t.Fatalf("got %v, want %v", got, want)
@@ -61,5 +63,22 @@ func AssertEqual[T comparable](t *testing.T, got, want T) {
 func AssertSliceEqual[T any](t *testing.T, got, want []T) {
 	if !reflect.DeepEqual(want, got) {
 		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func AssertSliceEqualUnordered[T comparable](t *testing.T, got, want []T) {
+	getCounts := func(list []T) map[T]int {
+		counts := make(map[T]int)
+		for _, t := range list {
+			if c, ok := counts[t]; ok {
+				counts[t] = c + 1
+			} else {
+				counts[t] = 0
+			}
+		}
+		return counts
+	}
+	if !reflect.DeepEqual(getCounts(want), getCounts(got)) {
+		t.Fatalf("counts mismatch - got %v, want %v", got, want)
 	}
 }

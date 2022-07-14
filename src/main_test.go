@@ -88,3 +88,30 @@ func TestWithoutChecksum(t *testing.T) {
 	opts.Checksum = false
 	testDuphunting(t)
 }
+
+func TestPostProcessDup(t *testing.T) {
+	group := []file_info.FileInfo{
+		file_info.FakeFile("f1", 100, 2001),
+		file_info.FakeFile("f2", 100, 2002),
+		file_info.FakeFile("f3", 100, 2003),
+		file_info.FakeFile("f4", 100, 2001),
+		file_info.FakeFile("f5", 100, 2004),
+		file_info.FakeFile("f6", 100, 2001),
+	}
+	func() {
+		// Removing duplicates.
+		opts.InodeAsDup = false
+		result := postProcessGroup(group)
+		AssertSliceEqualUnordered(t,
+			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
+			[]uint64{2001, 2002, 2003, 2004})
+	}()
+	func() {
+		// Not removing duplicates.
+		opts.InodeAsDup = true
+		result := postProcessGroup(group)
+		AssertSliceEqualUnordered(t,
+			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
+			[]uint64{2001, 2001, 2001, 2002, 2003, 2004})
+	}()
+}
