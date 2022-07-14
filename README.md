@@ -38,6 +38,12 @@ $ duphunter . --outtmpl '{"source": "$0", "copy": "$1"}'
 ```
 
 # Advanced Usage
+By itself, duphunter doesn't provide options for acting on the duplicate files -
+e.g. to delete them. It is designed with the Linux philosophy in mind, so that
+you can use it with other commands to do that and more.
+
+Some examples are shown below.
+
 ## Hard Link All Duplicates
 To do this we will modify the template to generate code, and then run it.
 

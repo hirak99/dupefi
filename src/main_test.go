@@ -89,6 +89,20 @@ func TestWithoutChecksum(t *testing.T) {
 	testDuphunting(t)
 }
 
+func TestPostProcessAllInodesSame(t *testing.T) {
+	group := []file_info.FileInfo{
+		file_info.FakeFile("f1", 100, 2001),
+		file_info.FakeFile("f2", 100, 2001),
+		file_info.FakeFile("f3", 100, 2001),
+	}
+	func() {
+		// Removing duplicates.
+		opts.InodeAsDup = false
+		result := postProcessGroup(group)
+		AssertEqual(t, len(result), 0)
+	}()
+}
+
 func TestPostProcessDup(t *testing.T) {
 	group := []file_info.FileInfo{
 		file_info.FakeFile("f1", 100, 2001),

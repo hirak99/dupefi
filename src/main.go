@@ -141,6 +141,9 @@ func postProcessGroup(group []file_info.FileInfo) []file_info.FileInfo {
 				return i == 0 || result[i].Inode != result[i-1].Inode
 			})
 	}
+	if len(result) <= 1 {
+		return nil
+	}
 	return result
 }
 
