@@ -20,6 +20,16 @@ func Map[T any, U any](data []T, f func(T) U) []U {
 	return mapped
 }
 
+func Filter[T any](list []T, cond func(int, T) bool) []T {
+	var newList []T
+	for i, t := range list {
+		if cond(i, t) {
+			newList = append(newList, t)
+		}
+	}
+	return newList
+}
+
 func FilterChan[T any](c <-chan T, f func(T) bool) <-chan T {
 	out := make(chan T)
 	go func() {

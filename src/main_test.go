@@ -67,7 +67,7 @@ func testDuphunting(t *testing.T) {
 		Map(files, func(f file_info.FileInfo) string { return f.Path }),
 		[]string{"f1", "f2", "f3", "subd1/f4.txt", "subd1/f5.txt"})
 
-	dups := findDups(files)
+	dups := postProcessDups(findDups(files))
 	AssertEqual(t, len(dups), 1)
 	AssertEqual(t, len(dups[0]), 2)
 

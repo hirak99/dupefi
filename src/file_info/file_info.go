@@ -18,7 +18,7 @@ type FileInfo struct {
 	Size int64
 
 	info  os.FileInfo
-	inode uint64
+	Inode uint64
 	// Don't access directly, call getChecksum() instead.
 	checksum *string
 }
@@ -101,7 +101,7 @@ func compare(path1, path2 string) bool {
 }
 
 func (f1 *FileInfo) IsDupOf(f2 *FileInfo, useChecksum bool) bool {
-	if f1.inode != 0 && f1.inode == f2.inode {
+	if f1.Inode != 0 && f1.Inode == f2.Inode {
 		return true
 	}
 	if f1.Size != f2.Size {
@@ -132,7 +132,7 @@ func ScanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
 					inode = stat.Ino
 				}
 				if r == nil || r.MatchString(path) {
-					out <- FileInfo{Path: path, info: info, inode: inode, Size: info.Size()}
+					out <- FileInfo{Path: path, info: info, Inode: inode, Size: info.Size()}
 				}
 				return nil
 			})

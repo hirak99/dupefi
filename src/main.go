@@ -23,6 +23,7 @@ var opts struct {
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
 	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'" default:""`
+	InodeAsDup   bool   `short:"i" description:"Consider hardlinks with same inode as duplicates"`
 	Positional   struct {
 		Directory string
 	} `positional-args:"yes"`
@@ -127,6 +128,32 @@ func getDisplayLines(duplicateGroups [][]file_info.FileInfo, baseTemplate string
 	return out
 }
 
+// Process a duplicate group.
+func postProcessGroup(group []file_info.FileInfo) []file_info.FileInfo {
+	var result []file_info.FileInfo
+	result = append(result, group...)
+	if !opts.InodeAsDup {
+		result = Filter(result,
+			func(i int, _ file_info.FileInfo) bool {
+				return i == 0 || result[i].Inode != result[i-1].Inode
+			})
+	}
+	fmt.Println(group)
+	fmt.Println(result)
+	return result
+}
+
+func postProcessDups(dups [][]file_info.FileInfo) [][]file_info.FileInfo {
+	var result [][]file_info.FileInfo
+	for _, group := range dups {
+		processed := postProcessGroup(group)
+		if len(processed) > 0 {
+			result = append(result, processed)
+		}
+	}
+	return result
+}
+
 func main() {
 	_, err := flags.ParseArgs(&opts, os.Args[1:])
 	if err != nil {
@@ -152,7 +179,7 @@ func main() {
 	// fmt.Println(sameSizeDups(files))
 	// But that would not take advantage of size based clustering.
 
-	duplicateGroups := findDups(files)
+	duplicateGroups := postProcessDups(findDups(files))
 
 	defer func() {
 		debugLog("Checksums computed: %v, Full comparisons: %v", file_info.NChecksums, file_info.NFullComparisons)
