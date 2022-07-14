@@ -16,15 +16,17 @@ import (
 var Githash string
 
 var opts struct {
-	MinSize      int64  `long:"min-size" description:"Minimum file size to include" default:"1"`
-	Verbose      bool   `short:"v" description:"Make it verbose"`
-	Checksum     bool   `short:"c" description:"Use checksum to compare - may require less disk access if there are many similar files"`
+	MinSize      int64  `long:"minsize" description:"Minimum file size to include" default:"1"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
-	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
+	BaseTemplate string `long:"basetmpl" description:"Template for base file"`
+	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'"`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
-	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'" default:""`
-	InodeAsDup   bool   `short:"i" description:"Report multiple hardlinks to the same inode as duplicates"`
-	Positional   struct {
+
+	Verbose    bool `short:"v" description:"Verbose to print additional outputs"`
+	Checksum   bool `short:"c" description:"Use checksum instead of full compare"`
+	InodeAsDup bool `short:"i" description:"Include multiple hardlinks to the same inode as duplicates"`
+
+	Positional struct {
 		Directory string
 	} `positional-args:"yes"`
 }
