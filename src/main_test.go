@@ -58,7 +58,7 @@ func TestRegexpScan(t *testing.T) {
 		[]string{"subd1/f4.txt", "subd1/f5.txt"})
 }
 
-func TestDuphunting(t *testing.T) {
+func testDuphunting(t *testing.T) {
 	defer setupCommonFiles()()
 
 	files := ChanToSlice(file_info.ScanDir(".", 1, nil))
@@ -77,4 +77,14 @@ func TestDuphunting(t *testing.T) {
 	AssertSliceEqual(t,
 		ChanToSlice(getDisplayLines(dups, "", "$0 -- $1")),
 		[]string{"f2 -- subd1/f4.txt"})
+}
+
+func TestWithChecksum(t *testing.T) {
+	opts.Checksum = true
+	testDuphunting(t)
+}
+
+func TestWithoutChecksum(t *testing.T) {
+	opts.Checksum = false
+	testDuphunting(t)
 }
