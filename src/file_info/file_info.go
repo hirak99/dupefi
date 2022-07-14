@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"syscall"
 )
 
@@ -112,28 +113,33 @@ func (f1 *FileInfo) IsDupOf(f2 *FileInfo) bool {
 	return compare(f1.Path, f2.Path)
 }
 
-func ScanDir(dir string, minSize int64) []FileInfo {
-	var files []FileInfo
-	err := filepath.Walk(dir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() || info.Size() < minSize {
+func ScanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
+	out := make(chan FileInfo)
+	go func() {
+		err := filepath.Walk(dir,
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if info.IsDir() || info.Size() < minSize {
+					return nil
+				}
+				var inode uint64
+				stat, ok := info.Sys().(*syscall.Stat_t)
+				if !ok {
+					return errors.New(fmt.Sprintf("Could not perform syscall on %v", path))
+				} else {
+					inode = stat.Ino
+				}
+				if r == nil || r.MatchString(path) {
+					out <- FileInfo{Path: path, info: info, inode: inode, Size: info.Size()}
+				}
 				return nil
-			}
-			var inode uint64
-			stat, ok := info.Sys().(*syscall.Stat_t)
-			if !ok {
-				return errors.New(fmt.Sprintf("Could not perform syscall on %v", path))
-			} else {
-				inode = stat.Ino
-			}
-			files = append(files, FileInfo{Path: path, info: info, inode: inode, Size: info.Size()})
-			return nil
-		})
-	if err != nil {
-		log.Println(err)
-	}
-	return files
+			})
+		close(out)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+	return out
 }

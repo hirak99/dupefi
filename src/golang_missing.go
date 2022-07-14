@@ -20,7 +20,21 @@ func Map[T any, U any](data []T, f func(T) U) []U {
 	return mapped
 }
 
-func GeneratorToSlice[T any](c <-chan T) []T {
+func FilterChan[T any](c <-chan T, f func(T) bool) <-chan T {
+	out := make(chan T)
+	go func() {
+		for e := range c {
+			if f(e) {
+				out <- e
+			}
+		}
+		close(out)
+	}()
+	return out
+}
+
+// Generator to slice.
+func ChanToSlice[T any](c <-chan T) []T {
 	var result []T
 	for v := range c {
 		result = append(result, v)

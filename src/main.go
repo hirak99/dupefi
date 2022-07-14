@@ -5,6 +5,7 @@ import (
 	"log"
 	"nomen_aliud/duphunter/file_info"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -20,6 +21,7 @@ var opts struct {
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file" default:""`
 	ShowVersion  bool   `long:"version" description:"Show the version and exit"`
+	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. \".jpg$\"" default:""`
 	Positional   struct {
 		Directory string
 	} `positional-args:"yes"`
@@ -142,7 +144,8 @@ func main() {
 		opts.Positional.Directory = "."
 	}
 
-	files := file_info.ScanDir(opts.Positional.Directory, opts.MinSize)
+	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))
+	files := ChanToSlice(file_info.ScanDir(opts.Positional.Directory, opts.MinSize, regex))
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))
