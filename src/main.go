@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"nomen_aliud/duphunter/file_info"
-	"os"
 	"regexp"
 	"strings"
 
@@ -27,7 +26,7 @@ var opts struct {
 
 	Positional struct {
 		Directory string
-	} `positional-args:"yes"`
+	} `positional-args:"yes" required:"true"`
 }
 
 func debugLog(s string, a ...interface{}) {
@@ -68,7 +67,7 @@ func getDisplayLines(duplicateGroups [][]file_info.FileInfo) <-chan string {
 }
 
 func main() {
-	_, err := flags.ParseArgs(&opts, os.Args[1:])
+	_, err := flags.Parse(&opts)
 	if err != nil {
 		if !flags.WroteHelp(err) {
 			panic(err)
@@ -79,10 +78,6 @@ func main() {
 	if opts.ShowVersion {
 		fmt.Printf("Git commit hash: %s\n", Githash)
 		return
-	}
-
-	if opts.Positional.Directory == "" {
-		opts.Positional.Directory = "."
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))
