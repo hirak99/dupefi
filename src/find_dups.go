@@ -76,6 +76,29 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 	// Copy the group into result.
 	result = append(result, group...)
 
+	// Paths matching those which shouldn't be reported as dups.
+	// Essentially if there are any such, only one of them must be reported and as the first element.
+	nodupset := MakeSet[string]()
+	if rnodup != nil {
+		for _, f := range group {
+			if rnodup.MatchString(f.Path) {
+				nodupset.Add(f.Path)
+			}
+		}
+	}
+	// Less-than function for sorting.
+	lessfn := func(f1, f2 *file_info.FileInfo) bool {
+		p1 := f1.Path
+		p2 := f2.Path
+		if nodupset.Has(p1) != nodupset.Has(p2) {
+			// If p1 is in nodupset, put it in the top.
+			return nodupset.HasInt(p1) > nodupset.HasInt(p2)
+		}
+		return p1 < p2
+	}
+
+	SaneSortSlice(result, lessfn)
+
 	// Check if duplicate inodes should be removed.
 	if !opts.InodeAsDup {
 		sort.Slice(result, func(i, j int) bool {
@@ -87,27 +110,13 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 			})
 	}
 
-	// Sort by name.
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Path < result[j].Path
-	})
+	// After the first element,
+	// drop everything in nodupset.
+	result = Filter(result,
+		func(i int, f file_info.FileInfo) bool {
+			return i == 0 || !nodupset.Has(f.Path)
+		})
 
-	// Check if some files shouldn't be reported as dups.
-	if rnodup != nil {
-		var nodups, dups []file_info.FileInfo
-		for _, f := range result {
-			if rnodup.MatchString(f.Path) {
-				nodups = append(nodups, f)
-			} else {
-				dups = append(dups, f)
-			}
-		}
-		if len(nodups) > 0 {
-			// Everything allowable in dups, is dup of one of the nodups.
-			result = append([]file_info.FileInfo{nodups[0]}, dups...)
-			debugLog("%v matching nodups of %v", len(nodups), nodups[0])
-		}
-	}
 	if len(result) <= 1 {
 		return nil
 	}

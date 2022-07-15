@@ -123,9 +123,6 @@ func TestPostProcessDup(t *testing.T) {
 		AssertSliceEqual(t,
 			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
 			[]string{"f1", "f2", "f3", "g2"})
-		AssertSliceEqualUnordered(t,
-			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
-			[]uint64{2001, 2002, 2003, 2004})
 	}
 	{
 		// Not removing inode duplicates.
@@ -134,9 +131,6 @@ func TestPostProcessDup(t *testing.T) {
 		AssertSliceEqual(t,
 			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
 			[]string{"f1", "f2", "f3", "g1", "g2", "g3"})
-		AssertSliceEqualUnordered(t,
-			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
-			[]uint64{2001, 2001, 2001, 2002, 2003, 2004})
 	}
 	{
 		// Not removing inode duplicates.

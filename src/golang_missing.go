@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -43,6 +44,43 @@ func FilterChan[T any](c <-chan T, f func(T) bool) <-chan T {
 	return out
 }
 
+// Allows sorting by the values instead of the indices.
+// Useful if you want to define the lessfn in a sane way, and use
+// it for multiple sort calls.
+func SaneSortSlice[T any](s []T, lessfn func(*T, *T) bool) {
+	sort.Slice(s, func(i, j int) bool { return lessfn(&s[i], &s[j]) })
+}
+
+// Set implementation.
+type setInternalStruct[T comparable] struct {
+	m map[T]bool
+}
+
+func MakeSet[T comparable]() setInternalStruct[T] {
+	s := setInternalStruct[T]{}
+	s.m = make(map[T]bool)
+	return s
+}
+
+func (s *setInternalStruct[T]) Add(e T) {
+	s.m[e] = true
+}
+
+func (s *setInternalStruct[T]) Has(e T) bool {
+	_, ok := s.m[e]
+	return ok
+}
+
+// Indicator function.
+func (s *setInternalStruct[T]) HasInt(e T) int {
+	_, ok := s.m[e]
+	return If(ok, 1, 0)
+}
+
+func (s *setInternalStruct[T]) Remove(e T) {
+	delete(s.m, e)
+}
+
 // Generator to slice.
 func ChanToSlice[T any](c <-chan T) []T {
 	var result []T
@@ -56,13 +94,13 @@ func ChanToSlice[T any](c <-chan T) []T {
 
 func AssertEqual[T comparable](t *testing.T, got, want T) {
 	if got != want {
-		t.Fatalf("got %v, want %v", got, want)
+		t.Errorf("got %v, want %v", got, want)
 	}
 }
 
 func AssertSliceEqual[T any](t *testing.T, got, want []T) {
 	if !reflect.DeepEqual(want, got) {
-		t.Fatalf("got %v, want %v", got, want)
+		t.Errorf("got %v, want %v", got, want)
 	}
 }
 
@@ -79,6 +117,6 @@ func AssertSliceEqualUnordered[T comparable](t *testing.T, got, want []T) {
 		return counts
 	}
 	if !reflect.DeepEqual(getCounts(want), getCounts(got)) {
-		t.Fatalf("counts mismatch - got %v, want %v", got, want)
+		t.Errorf("counts mismatch - got %v, want %v", got, want)
 	}
 }
