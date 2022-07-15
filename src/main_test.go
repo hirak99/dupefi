@@ -11,11 +11,10 @@ import (
 )
 
 func TestEmptyDir(t *testing.T) {
-	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
+	dir, err := ioutil.TempDir(t.TempDir(), "duphunter_test")
 	if err != nil {
 		panic(err)
 	}
-	defer os.RemoveAll(dir)
 
 	os.Chdir(dir)
 
@@ -27,8 +26,8 @@ func TestEmptyDir(t *testing.T) {
 
 // Create a temp directory, and set up some common files.
 // Returns a cleanup function that must be called as defer.
-func setupCommonFiles() func() {
-	dir, err := ioutil.TempDir(os.TempDir(), "duphunter_test")
+func setupCommonFiles(t *testing.T) {
+	dir, err := ioutil.TempDir(t.TempDir(), "duphunter_test")
 	if err != nil {
 		panic(err)
 	}
@@ -42,14 +41,10 @@ func setupCommonFiles() func() {
 	os.Mkdir(path.Join(dir, "subd1"), 0744)
 	os.WriteFile(path.Join(dir, "subd1", "f4.txt"), []byte("Hello Dup"), 0644)
 	os.WriteFile(path.Join(dir, "subd1", "f5.txt"), []byte("Hello"), 0644)
-
-	return func() {
-		os.RemoveAll(dir)
-	}
 }
 
 func TestRegexpScan(t *testing.T) {
-	defer setupCommonFiles()()
+	setupCommonFiles(t)
 
 	// Test regexp.
 	AssertSliceEqual(t,
@@ -60,7 +55,7 @@ func TestRegexpScan(t *testing.T) {
 }
 
 func testDuphunting(t *testing.T) {
-	defer setupCommonFiles()()
+	setupCommonFiles(t)
 
 	files := ChanToSlice(file_info.ScanDir(".", 1, nil))
 	// We don't expect f0 since it has zero length.
