@@ -71,11 +71,15 @@ func testDuphunting(t *testing.T) {
 	AssertEqual(t, len(dups), 1)
 	AssertEqual(t, len(dups[0]), 2)
 
+	opts.BaseTemplate = "$1"
+	opts.OutTemplate = "$0 -- $1"
 	AssertSliceEqual(t,
-		ChanToSlice(getDisplayLines(dups, "$1", "$0 -- $1")),
+		ChanToSlice(getDisplayLines(dups)),
 		[]string{"f2", "f2 -- subd1/f4.txt"})
+	opts.BaseTemplate = ""
+	opts.OutTemplate = "$0 -- $1"
 	AssertSliceEqual(t,
-		ChanToSlice(getDisplayLines(dups, "", "$0 -- $1")),
+		ChanToSlice(getDisplayLines(dups)),
 		[]string{"f2 -- subd1/f4.txt"})
 }
 
