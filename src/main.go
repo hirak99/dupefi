@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"nomen_aliud/duphunter/file_info"
+	. "nomen_aliud/duphunter/sanity"
 	"regexp"
 	"strings"
 

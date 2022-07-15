@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"nomen_aliud/duphunter/file_info"
+	. "nomen_aliud/duphunter/sanity"
 	"os"
 	"path"
 	"regexp"
