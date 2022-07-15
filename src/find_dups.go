@@ -88,7 +88,7 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 		}
 	}
 	// Less-than function for sorting.
-	lessfn := func(f1, f2 *file_info.FileInfo) bool {
+	lessfn := func(f1, f2 file_info.FileInfo) bool {
 		p1 := f1.Path
 		p2 := f2.Path
 		if nodupset.Has(p1) != nodupset.Has(p2) {

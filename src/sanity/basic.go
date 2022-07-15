@@ -42,13 +42,6 @@ func FilterChan[T any](c <-chan T, f func(T) bool) <-chan T {
 	return out
 }
 
-// Allows sorting by the values instead of the indices.
-// Useful if you want to define the lessfn in a sane way, and use
-// it for multiple sort calls.
-func SaneSortSlice[T any](s []T, lessfn func(*T, *T) bool) {
-	sort.Slice(s, func(i, j int) bool { return lessfn(&s[i], &s[j]) })
-}
-
 // Generator to slice.
 func ChanToSlice[T any](c <-chan T) []T {
 	var result []T
@@ -56,4 +49,11 @@ func ChanToSlice[T any](c <-chan T) []T {
 		result = append(result, v)
 	}
 	return result
+}
+
+// Allows sorting by the values instead of the indices.
+// Useful if you want to define the lessfn in a sane way, and use
+// it for multiple sort calls.
+func SaneSortSlice[T any](s []T, lessfn func(T, T) bool) {
+	sort.Slice(s, func(i, j int) bool { return lessfn(s[i], s[j]) })
 }
