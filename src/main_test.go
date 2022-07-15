@@ -102,7 +102,7 @@ func TestPostProcessAllInodesSame(t *testing.T) {
 	func() {
 		// Removing duplicates.
 		opts.InodeAsDup = false
-		result := postProcessGroup(group)
+		result := postProcessGroup(group, nil)
 		AssertEqual(t, len(result), 0)
 	}()
 }
@@ -112,24 +112,46 @@ func TestPostProcessDup(t *testing.T) {
 		file_info.FakeFile("f1", 100, 2001),
 		file_info.FakeFile("f2", 100, 2002),
 		file_info.FakeFile("f3", 100, 2003),
-		file_info.FakeFile("f4", 100, 2001),
-		file_info.FakeFile("f5", 100, 2004),
-		file_info.FakeFile("f6", 100, 2001),
+		file_info.FakeFile("g1", 100, 2001),
+		file_info.FakeFile("g2", 100, 2004),
+		file_info.FakeFile("g3", 100, 2001),
 	}
-	func() {
-		// Removing duplicates.
+	{
+		// Removing inode duplicates.
 		opts.InodeAsDup = false
-		result := postProcessGroup(group)
+		result := postProcessGroup(group, nil)
+		AssertSliceEqual(t,
+			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
+			[]string{"f1", "f2", "f3", "g2"})
 		AssertSliceEqualUnordered(t,
 			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
 			[]uint64{2001, 2002, 2003, 2004})
-	}()
-	func() {
-		// Not removing duplicates.
+	}
+	{
+		// Not removing inode duplicates.
 		opts.InodeAsDup = true
-		result := postProcessGroup(group)
+		result := postProcessGroup(group, nil)
+		AssertSliceEqual(t,
+			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
+			[]string{"f1", "f2", "f3", "g1", "g2", "g3"})
 		AssertSliceEqualUnordered(t,
 			Map(result, func(fi file_info.FileInfo) uint64 { return fi.Inode }),
 			[]uint64{2001, 2001, 2001, 2002, 2003, 2004})
-	}()
+	}
+	{
+		// Not removing inode duplicates.
+		opts.InodeAsDup = true
+		// Nodupregex satisfies all files.
+		result := postProcessGroup(group, regexp.MustCompile("^(f|g)"))
+		AssertEqual(t, len(result), 0)
+	}
+	{
+		// Not removing inode duplicates.
+		opts.InodeAsDup = true
+		// Nodupregex satisfies all file starting with g.
+		result := postProcessGroup(group, regexp.MustCompile("^g"))
+		AssertSliceEqual(t,
+			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
+			[]string{"g1", "f1", "f2", "f3"})
+	}
 }
