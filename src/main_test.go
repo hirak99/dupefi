@@ -22,7 +22,8 @@ import (
 	"testing"
 
 	"nomen_aliud/duphunter/file_info"
-	. "nomen_aliud/duphunter/sanity"
+
+	. "github.com/hirak99/go-sanity"
 )
 
 func TestEmptyDir(t *testing.T) {

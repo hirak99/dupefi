@@ -16,9 +16,10 @@ package main
 
 import (
 	"nomen_aliud/duphunter/file_info"
-	. "nomen_aliud/duphunter/sanity"
 	"regexp"
 	"sort"
+
+	. "github.com/hirak99/go-sanity"
 )
 
 func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {

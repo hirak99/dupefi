@@ -26,7 +26,7 @@ import (
 	"regexp"
 	"syscall"
 
-	. "nomen_aliud/duphunter/sanity"
+	. "github.com/hirak99/go-sanity"
 )
 
 type FileInfo struct {
