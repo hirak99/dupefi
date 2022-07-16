@@ -13,6 +13,11 @@ func expectError(t *testing.T, f func()) {
 	t.Errorf("Shouldn't reach here")
 }
 
+func TestAssert(t *testing.T) {
+	Assert(t, true)
+	expectError(t, func() { Assert(t, false) })
+}
+
 func TestAssertEqual(t *testing.T) {
 	AssertEqual(t, 1, 1)
 	expectError(t, func() { AssertEqual(t, 1, 2) })

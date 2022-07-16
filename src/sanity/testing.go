@@ -46,6 +46,12 @@ func logError(t *testing.T, msg string, a ...interface{}) {
 
 // Testing methods.
 
+func Assert(t *testing.T, cond bool) {
+	if !cond {
+		logError(t, "condition failed")
+	}
+}
+
 func AssertEqual[T comparable](t *testing.T, got, want T) {
 	if got != want {
 		logError(t, "got %v, want %v", got, want)

@@ -29,3 +29,7 @@ func (s *setInternalStruct[T]) HasInt(e T) int {
 func (s *setInternalStruct[T]) Remove(e T) {
 	delete(s.m, e)
 }
+
+func (s *setInternalStruct[T]) Count() int {
+	return len(s.m)
+}
