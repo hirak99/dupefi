@@ -1,35 +1,35 @@
 package sanity
 
 // Set implementation.
-type setInternalStruct[T comparable] struct {
+type set[T comparable] struct {
 	m map[T]bool
 }
 
-func MakeSet[T comparable]() setInternalStruct[T] {
-	s := setInternalStruct[T]{}
+func MakeSet[T comparable]() set[T] {
+	s := set[T]{}
 	s.m = make(map[T]bool)
 	return s
 }
 
-func (s *setInternalStruct[T]) Add(e T) {
+func (s *set[T]) Add(e T) {
 	s.m[e] = true
 }
 
-func (s *setInternalStruct[T]) Has(e T) bool {
+func (s *set[T]) Has(e T) bool {
 	_, ok := s.m[e]
 	return ok
 }
 
 // Indicator function.
-func (s *setInternalStruct[T]) HasInt(e T) int {
+func (s *set[T]) HasInt(e T) int {
 	_, ok := s.m[e]
 	return If(ok, 1, 0)
 }
 
-func (s *setInternalStruct[T]) Remove(e T) {
+func (s *set[T]) Remove(e T) {
 	delete(s.m, e)
 }
 
-func (s *setInternalStruct[T]) Count() int {
+func (s *set[T]) Count() int {
 	return len(s.m)
 }
