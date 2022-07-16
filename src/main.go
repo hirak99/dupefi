@@ -18,7 +18,7 @@ var Githash string
 
 var opts struct {
 	MinSize      int64  `long:"minsize" description:"Minimum file size to include" default:"1"`
-	OutTemplate  string `long:"outtmpl" description:"Output template" default:"$0 -- $1"`
+	OutTemplate  string `long:"outtmpl" description:"Output template" default:"\"$0\" -- \"$1\""`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file"`
 	Regex        string `long:"regex" description:"Regular expression to filter files, e.g. '\\.jpg$'"`
 	RegexNodup   string `long:"regexnodup" description:"Regular expression to specify files not to be reported as dups"`
