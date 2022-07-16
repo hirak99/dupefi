@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"syscall"
+
+	. "nomen_aliud/duphunter/sanity"
 )
 
 type FileInfo struct {
@@ -118,7 +120,7 @@ func (f1 *FileInfo) IsDupOf(f2 *FileInfo, useChecksum bool) bool {
 	return compare(f1.Path, f2.Path)
 }
 
-func ScanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
+func scanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
 	out := make(chan FileInfo)
 	go func() {
 		err := filepath.Walk(dir,
@@ -147,4 +149,20 @@ func ScanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
 		}
 	}()
 	return out
+}
+
+func ScanDirs(dirs []string, minSize int64, r *regexp.Regexp) []FileInfo {
+	var files []FileInfo
+	seen := MakeSet[string]()
+	for _, dir := range dirs {
+		newFiles := ChanToSlice(scanDir(dir, minSize, r))
+		for _, f := range newFiles {
+			if seen.Has(f.Path) {
+				continue
+			}
+			files = append(files, f)
+			seen.Add(f.Path)
+		}
+	}
+	return files
 }

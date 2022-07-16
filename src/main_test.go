@@ -2,12 +2,13 @@ package main
 
 import (
 	"io/ioutil"
-	"nomen_aliud/duphunter/file_info"
-	. "nomen_aliud/duphunter/sanity"
 	"os"
 	"path"
 	"regexp"
 	"testing"
+
+	"nomen_aliud/duphunter/file_info"
+	. "nomen_aliud/duphunter/sanity"
 )
 
 func TestEmptyDir(t *testing.T) {
@@ -18,7 +19,7 @@ func TestEmptyDir(t *testing.T) {
 
 	os.Chdir(dir)
 
-	files := ChanToSlice(file_info.ScanDir(".", 1, nil))
+	files := file_info.ScanDirs([]string{"."}, 1, nil)
 	AssertEqual(t, len(files), 0)
 	dups := findDups(files)
 	AssertEqual(t, len(dups), 0)
@@ -49,7 +50,7 @@ func TestRegexpScan(t *testing.T) {
 	// Test regexp.
 	AssertSliceEqual(t,
 		Map(
-			ChanToSlice(file_info.ScanDir(".", 1, regexp.MustCompile(`\.txt$`))),
+			file_info.ScanDirs([]string{"."}, 1, regexp.MustCompile(`\.txt$`)),
 			func(f file_info.FileInfo) string { return f.Path }),
 		[]string{"subd1/f4.txt", "subd1/f5.txt"})
 }
@@ -57,7 +58,7 @@ func TestRegexpScan(t *testing.T) {
 func testDuphunting(t *testing.T) {
 	setupCommonFiles(t)
 
-	files := ChanToSlice(file_info.ScanDir(".", 1, nil))
+	files := file_info.ScanDirs([]string{"."}, 1, nil)
 	// We don't expect f0 since it has zero length.
 	AssertSliceEqual(t,
 		Map(files, func(f file_info.FileInfo) string { return f.Path }),

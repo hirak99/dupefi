@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
-	"nomen_aliud/duphunter/file_info"
-	. "nomen_aliud/duphunter/sanity"
 	"regexp"
 	"strings"
+
+	"nomen_aliud/duphunter/file_info"
+	. "nomen_aliud/duphunter/sanity"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -27,7 +29,7 @@ var opts struct {
 	InodeAsDup bool `short:"i" description:"Include multiple hardlinks to the same inode as duplicates"`
 
 	Positional struct {
-		Directory string
+		Directory []string
 	} `positional-args:"yes" required:"true"`
 }
 
@@ -70,11 +72,15 @@ func getDisplayLines(duplicateGroups [][]file_info.FileInfo) <-chan string {
 
 func main() {
 	_, err := flags.Parse(&opts)
-	if err != nil {
-		if !flags.WroteHelp(err) {
-			panic(err)
-		}
+	if flags.WroteHelp(err) {
 		return
+	}
+
+	if len(opts.Positional.Directory) == 0 {
+		err = errors.New("At least one directory must be specified.")
+	}
+	if err != nil {
+		panic(err)
 	}
 
 	if opts.ShowVersion {
@@ -83,7 +89,7 @@ func main() {
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))
-	files := ChanToSlice(file_info.ScanDir(opts.Positional.Directory, opts.MinSize, regex))
+	files := file_info.ScanDirs(opts.Positional.Directory, opts.MinSize, regex)
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))
