@@ -107,10 +107,10 @@ func TestPostProcessAllInodesSame(t *testing.T) {
 func TestPostProcessDup(t *testing.T) {
 	group := []file_info.FileInfo{
 		file_info.FakeFile("f1", 100, 2001),
-		file_info.FakeFile("f2", 100, 2002),
+		file_info.FakeFile("f2", 100, 2004),
 		file_info.FakeFile("f3", 100, 2003),
 		file_info.FakeFile("g1", 100, 2001),
-		file_info.FakeFile("g2", 100, 2004),
+		file_info.FakeFile("g2", 100, 2002),
 		file_info.FakeFile("g3", 100, 2001),
 	}
 	{

@@ -102,13 +102,17 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 
 	// Check if duplicate inodes should be removed.
 	if !opts.InodeAsDup {
-		sort.Slice(result, func(i, j int) bool {
-			return result[i].Inode < result[j].Inode
-		})
-		result = Filter(result,
-			func(i int, _ file_info.FileInfo) bool {
-				return i == 0 || result[i].Inode != result[i-1].Inode
-			})
+		// Remove duplicate inodes without re-sorting.
+		seen := MakeSet[uint64]()
+		var newResult []file_info.FileInfo
+		for _, f := range result {
+			if seen.Has(f.Inode) {
+				continue
+			}
+			seen.Add(f.Inode)
+			newResult = append(newResult, f)
+		}
+		result = newResult
 	}
 
 	// After the first element,
