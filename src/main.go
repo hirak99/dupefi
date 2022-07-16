@@ -29,7 +29,7 @@ var opts struct {
 	InodeAsDup bool `short:"i" description:"Include multiple hardlinks to the same inode as duplicates"`
 
 	Positional struct {
-		Directory []string
+		Directories []string
 	} `positional-args:"yes" required:"true"`
 }
 
@@ -76,7 +76,7 @@ func main() {
 		return
 	}
 
-	if len(opts.Positional.Directory) == 0 {
+	if len(opts.Positional.Directories) == 0 {
 		err = errors.New("At least one directory must be specified.")
 	}
 	if err != nil {
@@ -89,7 +89,7 @@ func main() {
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))
-	files := file_info.ScanDirs(opts.Positional.Directory, opts.MinSize, regex)
+	files := file_info.ScanDirs(opts.Positional.Directories, opts.MinSize, regex)
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))
