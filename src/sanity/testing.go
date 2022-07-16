@@ -9,10 +9,6 @@ import (
 	"testing"
 )
 
-// For testing the tests.
-var panicAsError bool
-
-
 // Print stack trace, excluding this module.
 func printStack() {
 	// Unlike a sane language, debug.Stack() is a sequence of bytes.
@@ -35,6 +31,9 @@ func printStack() {
 	println("Partial stack trace -")
 	println(strings.Join(lines[firstLineOut:], "\n"))
 }
+
+// For testing the tests.
+var panicAsError bool
 
 func logError(t *testing.T, msg string, a ...interface{}) {
 	if panicAsError {
