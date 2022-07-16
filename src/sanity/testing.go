@@ -1,21 +1,61 @@
 package sanity
 
 import (
+	"fmt"
 	"reflect"
+	"regexp"
+	"runtime/debug"
+	"strings"
 	"testing"
 )
+
+// For testing the tests.
+var panicAsError bool
+
+
+// Print stack trace, excluding this module.
+func printStack() {
+	// Unlike a sane language, debug.Stack() is a sequence of bytes.
+	// So we resort to string matching to filter out this module.
+	stack := string(debug.Stack())
+	lines := strings.Split(stack, "\n")
+	var firstLineOut int
+	for i, line := range lines {
+		if line[0] != '\t' {
+			continue
+		}
+		match, _ := regexp.MatchString(`/testing.go:`, line)
+		// The first line after any `/testing.go` match is outside this module.
+		if match {
+			firstLineOut = i + 1
+		} else if firstLineOut > 0 {
+			break
+		}
+	}
+	println("Partial stack trace -")
+	println(strings.Join(lines[firstLineOut:], "\n"))
+}
+
+func logError(t *testing.T, msg string, a ...interface{}) {
+	if panicAsError {
+		panic(fmt.Sprintf(msg, a...))
+	} else {
+		printStack()
+		t.Errorf(msg, a...)
+	}
+}
 
 // Testing methods.
 
 func AssertEqual[T comparable](t *testing.T, got, want T) {
 	if got != want {
-		t.Errorf("got %v, want %v", got, want)
+		logError(t, "got %v, want %v", got, want)
 	}
 }
 
 func AssertSliceEqual[T any](t *testing.T, got, want []T) {
 	if !reflect.DeepEqual(want, got) {
-		t.Errorf("got %v, want %v", got, want)
+		logError(t, "got %v, want %v", got, want)
 	}
 }
 
@@ -32,6 +72,6 @@ func AssertSliceEqualUnordered[T comparable](t *testing.T, got, want []T) {
 		return counts
 	}
 	if !reflect.DeepEqual(getCounts(want), getCounts(got)) {
-		t.Errorf("counts mismatch - got %v, want %v", got, want)
+		logError(t, "counts mismatch - got %v, want %v", got, want)
 	}
 }
