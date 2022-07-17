@@ -9,13 +9,18 @@ Usage below).
 
 Dependency: Install [golang](https://go.dev/doc/install) for your system.
 
-Then run the following -
+To install, run -
 
 ```bash
 git clone https://github.com/hirak99/dupefi
 cd dupefi
 scripts/build_and_install.sh
 ```
+
+To uninstall, run -
+```bash
+sudo rm /usr/bin/dupefi
+````
 
 ## Windows
 With minor modifications, it *should* also work on Windows. If anyone does it,
@@ -82,10 +87,10 @@ So we change the output template so that what it prints are the bash commands
 for hard linking -
 
 ```bash
-$ dupefi . --outtmpl 'cp -l "$0" "$1"'
+$ dupefi . --outtmpl 'cp -lf "$0" "$1"'
 # Output -
-cp -l "/path/to/f1" "/path/to/f1copy"
-cp -l "/path/to/f2" "/path/to/f2copy"
+cp -lf "/path/to/f1" "/path/to/f1copy"
+cp -lf "/path/to/f2" "/path/to/f2copy"
 ```
 
 Then we run it in the shell by sourcing it.
