@@ -105,7 +105,7 @@ func main() {
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))
-	files := file_info.ScanDirs(opts.Positional.Directories, opts.MinSize, regex)
+	files := file_info.ScanDirs(opts.Positional.Directories, opts.MinSize, regex, !opts.NoProgress)
 
 	// We could call sameSizeDups here, e.g. -
 	// fmt.Println(sameSizeDups(files))

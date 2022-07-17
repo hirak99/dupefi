@@ -17,7 +17,6 @@ package file_info
 import (
 	"bytes"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -134,8 +133,9 @@ func (f1 *FileInfo) IsDupOf(f2 *FileInfo, useChecksum bool) bool {
 	return compare(f1.Path, f2.Path)
 }
 
-func scanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
+func scanDir(dir string, minSize int64, r *regexp.Regexp, showProgress bool) <-chan FileInfo {
 	out := make(chan FileInfo)
+	nfiles := 0
 	go func() {
 		err := filepath.Walk(dir,
 			func(path string, info os.FileInfo, err error) error {
@@ -148,16 +148,23 @@ func scanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
 				var inode uint64
 				stat, ok := info.Sys().(*syscall.Stat_t)
 				if !ok {
-					return errors.New(fmt.Sprintf("Could not perform syscall on %v", path))
+					return fmt.Errorf("could not perform syscall on %v", path)
 				} else {
 					inode = stat.Ino
 				}
 				if r == nil || r.MatchString(path) {
 					out <- FileInfo{Path: path, info: info, Inode: inode, Size: info.Size()}
+					nfiles += 1
+					if showProgress {
+						print(fmt.Sprintf("\rFiles found: %v", nfiles))
+					}
 				}
 				return nil
 			})
 		close(out)
+		if showProgress {
+			println()
+		}
 		if err != nil {
 			log.Println(err)
 		}
@@ -165,11 +172,11 @@ func scanDir(dir string, minSize int64, r *regexp.Regexp) <-chan FileInfo {
 	return out
 }
 
-func ScanDirs(dirs []string, minSize int64, r *regexp.Regexp) []FileInfo {
+func ScanDirs(dirs []string, minSize int64, r *regexp.Regexp, showProgress bool) []FileInfo {
 	var files []FileInfo
 	seen := MakeSet[string]()
 	for _, dir := range dirs {
-		newFiles := ChanToSlice(scanDir(dir, minSize, r))
+		newFiles := ChanToSlice(scanDir(dir, minSize, r, showProgress))
 		for _, f := range newFiles {
 			if seen.Has(f.Path) {
 				continue

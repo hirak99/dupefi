@@ -82,14 +82,14 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 		}))
 	var doneBytes int64
 	for _, size := range sizes {
-		// debugLog("Checking %v file(s) for size %v...\n", len(filesBySize[size]), size)
+		debugLog("Checking %v file(s) of size %v...\n", len(filesBySize[size]), size)
 		r := sameSizeDups(filesBySize[size])
 		if len(r) > 0 {
 			results = append(results, r...)
 		}
 		doneBytes += size * int64(len(filesBySize[size])-1)
 		if !opts.NoProgress && totalBytes > 0 {
-			print(fmt.Sprintf("\rProgress %v%% ", 100.0*(doneBytes/totalBytes)))
+			print(fmt.Sprintf("\rComparing %v%% ", int(10000.0*doneBytes/totalBytes)/100))
 		}
 	}
 	if !opts.NoProgress && totalBytes > 0 {
