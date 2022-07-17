@@ -22,10 +22,10 @@ go test ./...
 
 # Should show error if no directories are passed.
 go run . 2>/dev/null && exit 1
-# Should terminate normally.
-go run . . 2>/dev/null
 
 # Match expected outputs.
+go run . . 2>&1 1>/dev/null | grep -q "Files found"
 go run . 2>&1 1>/dev/null | grep -q "You must specify at least one directory"
 go run . --version | grep -q 'Built on'
 go run . --help | grep -q 'Usage:'
+echo Tests passed 👍

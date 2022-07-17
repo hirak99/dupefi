@@ -15,6 +15,9 @@
 
 set -uexo pipefail
 readonly MY_PATH=$(cd $(dirname "$0") && pwd)
+
+$MY_PATH/run_tests.sh
+
 cd $MY_PATH/../src
 
 LOCAL_MOD=""
