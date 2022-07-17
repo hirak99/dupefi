@@ -63,17 +63,18 @@ $ dupefi . --outtmpl '{"source": "$0", "copy": "$1"}'
 ```
 
 # Advanced Usage (Linux)
-By itself, dupefi doesn't provide options for acting on the duplicate files -
-e.g. to delete them. It is designed with the Linux philosophy in mind, so that
-you can use it with other commands to do that and more.
+By itself, dupefi doesn't act on the duplicate files.
 
-Some examples are shown below.
+However it's designed to be usable in conjunction with other Linux commands to organize them.
+
+Few examples are shown below.
 
 ## Hard Link All Duplicates
 
 One liner -
 > **Warning**
-> This command will run immediately, and
+> This command will run immediately, and the effects will be irreversible.
+> In particular, existing attributes of files replaced with hard links will be lost.
 
 ```bash
 # WARNING: This will run immediately and will be irreversible.
