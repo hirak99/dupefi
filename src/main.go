@@ -15,9 +15,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 
@@ -89,14 +89,17 @@ func main() {
 	if flags.WroteHelp(err) {
 		return
 	}
-
 	if len(opts.Positional.Directories) == 0 {
-		err = errors.New("At least one directory must be specified.")
+		println()
+		println("You must specify at least one directory to operate on.")
+		println()
+		println("Try `dupefi .`")
+		println("Or `dupefi --help` to display all options.")
+		os.Exit(1)
 	}
 	if err != nil {
 		panic(err)
 	}
-
 	if opts.ShowVersion {
 		fmt.Printf("Git commit hash: %s\n", Githash)
 		return
