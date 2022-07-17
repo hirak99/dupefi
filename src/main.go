@@ -43,7 +43,7 @@ var opts struct {
 
 	Positional struct {
 		Directories []string
-	} `positional-args:"yes"`
+	} `positional-args:"yes" required:"true"`
 }
 
 func debugLog(s string, a ...interface{}) {
