@@ -15,6 +15,7 @@
 package main
 
 import (
+	"fmt"
 	"nomen_aliud/dupefi/file_info"
 	"regexp"
 	"sort"
@@ -75,13 +76,24 @@ func findDups(files []file_info.FileInfo) [][]file_info.FileInfo {
 	debugLog("Sorted sizes: %v\n", sizes)
 
 	var results [][]file_info.FileInfo
+	totalBytes := Sum(Map(sizes,
+		func(size int64) int64 {
+			return size * int64(len(filesBySize[size])-1)
+		}))
+	var doneBytes int64
 	for _, size := range sizes {
 		// debugLog("Checking %v file(s) for size %v...\n", len(filesBySize[size]), size)
 		r := sameSizeDups(filesBySize[size])
 		if len(r) > 0 {
-			debugLog("Found some dups")
 			results = append(results, r...)
 		}
+		doneBytes += size * int64(len(filesBySize[size])-1)
+		if !opts.NoProgress {
+			print(fmt.Sprintf("\rProgress %v%%", 100.0*(doneBytes/totalBytes)))
+		}
+	}
+	if !opts.NoProgress {
+		println(" done.")
 	}
 	return results
 }
