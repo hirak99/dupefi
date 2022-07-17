@@ -15,7 +15,7 @@
 package main
 
 import (
-	"nomen_aliud/duphunter/file_info"
+	"nomen_aliud/dupefi/file_info"
 	"regexp"
 	"sort"
 

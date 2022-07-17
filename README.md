@@ -12,8 +12,8 @@ Dependency: Install [golang](https://go.dev/doc/install) for your system.
 Then run the following -
 
 ```bash
-git clone https://github.com/hirak99/duphunter
-cd duphunter
+git clone https://github.com/hirak99/dupefi
+cd dupefi
 scripts/build_and_install.sh
 ```
 
@@ -25,7 +25,7 @@ please send me a pull request.
 
 ## Call Examples
 ```bash
-$ duphunter .
+$ dupefi .
 # Output -
 "/path/to/f1" -- "/path/to/f1copy"
 "/path/to/f2" -- "/path/to/f2copy"
@@ -33,7 +33,7 @@ $ duphunter .
 
 List original (base) files followed by all duplicates -
 ```bash
-$ duphunter . --basetmpl '"$1"' --outtmpl '  "$1"'
+$ dupefi . --basetmpl '"$1"' --outtmpl '  "$1"'
 # Output -
 "/path/to/f1"
   "/path/to/f1copy"
@@ -43,7 +43,7 @@ $ duphunter . --basetmpl '"$1"' --outtmpl '  "$1"'
 
 Just list all duplicate files (not the originals) -
 ```bash
-$ duphunter . --outtmpl '"$1"'
+$ dupefi . --outtmpl '"$1"'
 # Output -
 "/path/to/f1copy"
 "/path/to/f2copy"
@@ -51,14 +51,14 @@ $ duphunter . --outtmpl '"$1"'
 
 Change output template to output json.
 ```bash
-$ duphunter . --outtmpl '{"source": "$0", "copy": "$1"}'
+$ dupefi . --outtmpl '{"source": "$0", "copy": "$1"}'
 # Output -
 {"source": "/path/to/f1" "copy": "/path/to/f1copy"}
 {"source": "/path/to/f2" "copy": "/path/to/f2copy"}
 ```
 
 # Advanced Usage (Linux)
-By itself, duphunter doesn't provide options for acting on the duplicate files -
+By itself, dupefi doesn't provide options for acting on the duplicate files -
 e.g. to delete them. It is designed with the Linux philosophy in mind, so that
 you can use it with other commands to do that and more.
 
@@ -72,17 +72,17 @@ One liner -
 
 ```bash
 # WARNING: This will run immediately and will be irreversible.
-source <(duphunter . --outtmpl 'cp -lf "$0" "$1"')
+source <(dupefi . --outtmpl 'cp -lf "$0" "$1"')
 ```
 
 ### Explanation
-The `duphunter` program doesn't run anything by itself.
+The `dupefi` program doesn't run anything by itself.
 
 So we change the output template so that what it prints are the bash commands
 for hard linking -
 
 ```bash
-$ duphunter . --outtmpl 'cp -l "$0" "$1"'
+$ dupefi . --outtmpl 'cp -l "$0" "$1"'
 # Output -
 cp -l "/path/to/f1" "/path/to/f1copy"
 cp -l "/path/to/f2" "/path/to/f2copy"
@@ -95,7 +95,7 @@ Then we run it in the shell by sourcing it.
 Print the total size lost in duplicates -
 
 ```bash
-duphunter . --outtmpl '$1' | xargs du -sch
+dupefi . --outtmpl '$1' | xargs du -sch
 ```
 
 ## Delete Duplicates (Dangerous!)
@@ -105,14 +105,14 @@ duphunter . --outtmpl '$1' | xargs du -sch
 
 ```bash
 # WARNING: This will immediately, irreversibly, delete the duplicates.
-source <(duphunter . --outtmpl 'rm "$1"')
+source <(dupefi . --outtmpl 'rm "$1"')
 ```
 
 For an explanation, see the example on hardlinking.
 
 # Help
 
-`duphunter [OPTIONS] Directories...`
+`dupefi [OPTIONS] Directories...`
 
 Positional args -
 * Directories... One or more directories to scan.
@@ -140,4 +140,4 @@ Short options -
   (i.e. is a hardlink) and doesn't take up additional space.
 * **-v**: Verbose.
 
-Please run `duphunter --help` to display all args.
+Please run `dupefi --help` to display all args.

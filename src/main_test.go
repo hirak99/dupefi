@@ -21,13 +21,13 @@ import (
 	"regexp"
 	"testing"
 
-	"nomen_aliud/duphunter/file_info"
+	"nomen_aliud/dupefi/file_info"
 
 	. "github.com/hirak99/go-sanity"
 )
 
 func TestEmptyDir(t *testing.T) {
-	dir, err := ioutil.TempDir(t.TempDir(), "duphunter_test")
+	dir, err := ioutil.TempDir(t.TempDir(), "dupefi_test")
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,7 @@ func TestEmptyDir(t *testing.T) {
 // Create a temp directory, and set up some common files.
 // Returns a cleanup function that must be called as defer.
 func setupCommonFiles(t *testing.T) {
-	dir, err := ioutil.TempDir(t.TempDir(), "duphunter_test")
+	dir, err := ioutil.TempDir(t.TempDir(), "dupefi_test")
 	if err != nil {
 		panic(err)
 	}

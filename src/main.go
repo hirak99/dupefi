@@ -21,7 +21,7 @@ import (
 	"regexp"
 	"strings"
 
-	"nomen_aliud/duphunter/file_info"
+	"nomen_aliud/dupefi/file_info"
 
 	. "github.com/hirak99/go-sanity"
 	"github.com/jessevdk/go-flags"

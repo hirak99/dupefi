@@ -1,4 +1,4 @@
-module nomen_aliud/duphunter
+module nomen_aliud/dupefi
 
 go 1.18
 
