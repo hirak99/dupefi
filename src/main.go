@@ -21,14 +21,12 @@ import (
 	"regexp"
 	"strings"
 
+	"nomen_aliud/dupefi/buildinfo"
 	"nomen_aliud/dupefi/file_info"
 
 	. "github.com/hirak99/go-sanity"
 	"github.com/jessevdk/go-flags"
 )
-
-// Stores the git hash passed in build script.
-var Githash string
 
 var opts struct {
 	MinSize      int64  `long:"minsize" description:"Minimum file size to include" default:"1"`
@@ -45,7 +43,7 @@ var opts struct {
 
 	Positional struct {
 		Directories []string
-	} `positional-args:"yes" required:"true"`
+	} `positional-args:"yes"`
 }
 
 func debugLog(s string, a ...interface{}) {
@@ -90,6 +88,13 @@ func main() {
 	if flags.WroteHelp(err) {
 		return
 	}
+	if opts.ShowVersion {
+		fmt.Printf("Built on '%s' from '%s'.\n", buildinfo.BuildTime, buildinfo.Githash)
+		return
+	}
+	if err != nil {
+		panic(err)
+	}
 	if len(opts.Positional.Directories) == 0 {
 		println()
 		println("You must specify at least one directory to operate on.")
@@ -97,13 +102,6 @@ func main() {
 		println("Try `dupefi .`")
 		println("Or `dupefi --help` to display all options.")
 		os.Exit(1)
-	}
-	if err != nil {
-		panic(err)
-	}
-	if opts.ShowVersion {
-		fmt.Printf("Git commit hash: %s\n", Githash)
-		return
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))

@@ -16,3 +16,16 @@
 readonly MY_PATH=$(cd $(dirname "$0") && pwd)
 cd $MY_PATH/../src
 go test ./...
+
+# Commandline tests.
+set -e  # Fail on any error.
+
+# Should show error if no directories are passed.
+go run . 2>/dev/null && exit 1
+# Should terminate normally.
+go run . . 2>/dev/null
+
+# Match expected outputs.
+go run . 2>&1 | grep -q "You must specify at least one directory"
+go run . --version | grep -q 'Git commit hash'
+go run . --help | grep -q 'Usage:'
