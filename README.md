@@ -1,7 +1,7 @@
 A command-line duplicate file finder designed with linux philosophy.
 
 It allows customizable outputs, and thus chaining of commands (see Advanced
-Usage below).
+Usage Examples below).
 
 # Installation
 
@@ -26,9 +26,7 @@ sudo rm /usr/bin/dupefi
 With minor modifications, it *should* also work on Windows. If anyone does it,
 please send me a pull request.
 
-# Usage
-
-## Call Examples
+# Usage Examples
 ```bash
 $ dupefi .
 # Output -
@@ -62,7 +60,7 @@ $ dupefi . --outtmpl '{"source": "$0", "copy": "$1"}'
 {"source": "/path/to/f2" "copy": "/path/to/f2copy"}
 ```
 
-# Advanced Usage (Linux)
+# Advanced Usage Examples (Linux)
 By itself, dupefi doesn't act on the duplicate files.
 
 However it's designed to be usable in conjunction with other Linux commands to organize them.
@@ -104,17 +102,18 @@ Print the total size lost in duplicates -
 dupefi . --outtmpl '$1' | xargs du -sch
 ```
 
-## Delete Duplicates (Dangerous!)
+## Delete Duplicates
 
 > **Warning**
 > This command will run immediately, and it will remove files irreversibly.
+> It is strongly advised to run it without `source` and carefully examine the duplicates identified before running the command below.
 
 ```bash
 # WARNING: This will immediately, irreversibly, delete the duplicates.
 source <(dupefi . --outtmpl 'rm "$1"')
 ```
 
-For an explanation, see the example on hardlinking.
+For an explanation, see the comments on the hardlinking example above.
 
 # Help
 
