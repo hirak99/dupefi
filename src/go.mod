@@ -3,7 +3,7 @@ module nomen_aliud/duphunter
 go 1.18
 
 require (
-	github.com/hirak99/go-sanity v0.1.4
+	github.com/hirak99/go-sanity v0.1.5
 	github.com/jessevdk/go-flags v1.5.0
 )
 
