@@ -70,10 +70,18 @@ Few examples are shown below.
 ## Hard Link All Duplicates
 
 One liner -
-> **Warning**
-> This command will run immediately, and the effects will be irreversible.
-> In particular, existing attributes of files replaced with hard links will be lost.
+> **Warning** This will run immediately without confirmation, and the effects
+> will be irreversible. In particular, existing attributes of files replaced
+> with hard links will be lost.
 
+```bash
+# WARNING: This will run immediately and will be irreversible.
+dupefi . --outtmpl 'cp -lf "$0" "$1"' |
+  while read -r line
+  $line  # Precede this line with an 'echo' to check before running.
+  done
+```
+Or equivalently,
 ```bash
 # WARNING: This will run immediately and will be irreversible.
 source <(dupefi . --outtmpl 'cp -lf "$0" "$1"')
