@@ -34,6 +34,14 @@ $ dupefi .
 "/path/to/f2" -- "/path/to/f2copy"
 ```
 
+Compare against another path so only duplicates across paths are displayed -
+
+```bash
+$ dupefi . --against=/other/path
+# Output -
+"/path/to/f3" -- "/other/path/f3"
+```
+
 List original (base) files followed by all duplicates -
 ```bash
 $ dupefi . --basetmpl '"$1"' --outtmpl '  "$1"'
