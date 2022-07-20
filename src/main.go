@@ -29,6 +29,7 @@ import (
 )
 
 var opts struct {
+	Against      string `long:"against" description:"Compares against this directory. No files from this directory are reported as dup."`
 	MinSize      int64  `long:"minsize" description:"Minimum file size to include" default:"1"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"\"$0\" -- \"$1\""`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file"`
@@ -102,6 +103,13 @@ func main() {
 		println("Try `dupefi .`")
 		println("Or `dupefi --help` to display all options.")
 		os.Exit(1)
+	}
+
+	if opts.Against != "" {
+		if opts.Against[len(opts.Against)-1] != os.PathSeparator {
+			opts.Against = opts.Against + string(os.PathSeparator)
+		}
+		opts.Positional.Directories = append(opts.Positional.Directories, opts.Against)
 	}
 
 	regex := If(opts.Regex == "", nil, regexp.MustCompile(opts.Regex))

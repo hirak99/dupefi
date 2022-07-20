@@ -160,4 +160,30 @@ func TestPostProcessDup(t *testing.T) {
 			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
 			[]string{"g1", "f1", "f2", "f3"})
 	}
+	{
+		// Not removing inode duplicates.
+		opts.InodeAsDup = true
+		// Against "g".
+		// Note that main.go will not actually let this happen, as it will add "g/".
+		// Nonetheless, this is a good test to simulate against.
+		// We expect this to be in the beginning.
+		opts.Against = "g"
+		result := postProcessGroup(group, nil)
+		AssertSliceEqual(t,
+			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
+			[]string{"g1", "f1", "f2", "f3"})
+		opts.Against = ""
+	}
+	{
+		// Not removing inode duplicates.
+		opts.InodeAsDup = true
+		// Against "h/".
+		// Since there's no files beginning with "h/", none of the results i eligible.
+		opts.Against = "h/"
+		result := postProcessGroup(group, nil)
+		AssertSliceEqual(t,
+			Map(result, func(fi file_info.FileInfo) string { return fi.Path }),
+			[]string{})
+		opts.Against = ""
+	}
 }

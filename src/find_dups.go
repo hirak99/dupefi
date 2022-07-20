@@ -19,6 +19,7 @@ import (
 	"nomen_aliud/dupefi/file_info"
 	"regexp"
 	"sort"
+	"strings"
 
 	. "github.com/hirak99/go-sanity"
 )
@@ -107,11 +108,10 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 	// Paths matching those which shouldn't be reported as dups.
 	// Essentially if there are any such, only one of them must be reported and as the first element.
 	nodupset := MakeSet[string]()
-	if rnodup != nil {
-		for _, f := range group {
-			if rnodup.MatchString(f.Path) {
-				nodupset.Add(f.Path)
-			}
+	for _, f := range group {
+		if (rnodup != nil && rnodup.MatchString(f.Path)) ||
+			(opts.Against != "" && strings.HasPrefix(f.Path, opts.Against)) {
+			nodupset.Add(f.Path)
 		}
 	}
 	// Less-than function for sorting.
@@ -119,7 +119,7 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 		p1 := f1.Path
 		p2 := f2.Path
 		if nodupset.Has(p1) != nodupset.Has(p2) {
-			// If p1 is in nodupset, put it in the top.
+			// If p1 is in nodupset, put it at the top.
 			return nodupset.HasInt(p1) > nodupset.HasInt(p2)
 		}
 		return p1 < p2
@@ -150,6 +150,10 @@ func postProcessGroup(group []file_info.FileInfo, rnodup *regexp.Regexp) []file_
 		})
 
 	if len(result) <= 1 {
+		return nil
+	}
+	if opts.Against != "" && !strings.HasPrefix(result[0].Path, opts.Against) {
+		// Do not report internal duplicats when comparing against a directory.
 		return nil
 	}
 	return result

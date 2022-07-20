@@ -132,6 +132,7 @@ Positional args -
 
 Options -
 
+* **--against=**: Compares all directories you specified againt this directory.
 * **--minsize=**: Minimum file size to consider in bytes. The default value 1
   ignores all empty files.
 * **--outtmpl=**: Template of output that's generated per each copy. Any `$0`
