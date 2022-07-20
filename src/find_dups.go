@@ -25,6 +25,14 @@ import (
 )
 
 func sameSizeDups(files []file_info.FileInfo) [][]file_info.FileInfo {
+	if opts.Against != "" {
+		// If this group entirely consists of one or other side of --against, no need to compare.
+		if All(files, func(f file_info.FileInfo) bool { return strings.HasPrefix(f.Path, opts.Against) }) ||
+			All(files, func(f file_info.FileInfo) bool { return !strings.HasPrefix(f.Path, opts.Against) }) {
+			return nil
+		}
+	}
+
 	var groups [][]int
 	for i := 0; i < len(files); i++ {
 		found := false
