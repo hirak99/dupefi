@@ -29,7 +29,7 @@ import (
 )
 
 var opts struct {
-	Against      string `long:"against" description:"Compares against this directory. No files from this directory are reported as dup."`
+	Against      string `long:"against" description:"Compares against a specified directory"`
 	MinSize      int64  `long:"minsize" description:"Minimum file size to include" default:"1"`
 	OutTemplate  string `long:"outtmpl" description:"Output template" default:"\"$0\" -- \"$1\""`
 	BaseTemplate string `long:"basetmpl" description:"Template for base file"`
