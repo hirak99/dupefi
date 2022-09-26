@@ -5,7 +5,14 @@ Usage Examples below).
 
 # Installation
 
-## Linux
+## Arch Linux
+The package is available on [AUR](https://aur.archlinux.org/).
+Use your favorite AUR manager, e.g. -
+```
+yay -Syu dupefi
+```
+
+## Linux (From Source)
 
 Dependency: Install [golang](https://go.dev/doc/install) for your system.
 
