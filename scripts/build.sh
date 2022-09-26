@@ -15,9 +15,24 @@
 
 set -uexo pipefail
 readonly MY_PATH=$(cd $(dirname "$0") && pwd)
-cd $MY_PATH
 
-./run_tests.sh
-./build.sh
+cd $MY_PATH/../src
 
-sudo install -Dm755 ../build/dupefi /usr/bin/dupefi
+LOCAL_MOD=""
+if ! (git diff --exit-code > /dev/null) \
+  || ! [[ -z "$(git status --porcelain)" ]] ; then
+  LOCAL_MOD="_locally_modified"
+fi
+
+GITHASH=$(git rev-parse HEAD)$LOCAL_MOD
+echo $GITHASH
+
+GITDATE=$(date --date=@$(git log -1 --format="%at") +%Y_%m_%d)
+
+mkdir -p ../build
+
+# To get variable names for X, try go tool nm /usr/bin/dupefi
+BUILDINFO="nomen_aliud/dupefi/buildinfo"
+go build -ldflags "-X '$BUILDINFO.Githash=$GITHASH' -X '$BUILDINFO.BuildTime=$GITDATE'" -o ../build/
+# Or -
+# go build -ldflags "-X 'main.Githash=$GITHASH'"
